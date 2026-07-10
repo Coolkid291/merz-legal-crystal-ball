@@ -1,0 +1,17 @@
+# The source workbook must NEVER be committed — only the extracted data.json.
+*.xlsm
+*.xlsx
+*.xls
+~$*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

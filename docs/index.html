@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merz Legal Crystal Ball — Search</title>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-soft:#2f4a80;
+    --ink:#1a1a1a;
+    --muted:#5b6470;
+    --line:#e2e6ec;
+    --bg:#ffffff;
+    --chip-bg:#eef1f6;
+    --mark:#ffe08a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.5;
+  }
+  header{
+    background:var(--navy);color:#fff;padding:22px 20px 18px;
+  }
+  header .wrap{max-width:960px;margin:0 auto}
+  header h1{margin:0;font-size:20px;letter-spacing:.2px;font-weight:650}
+  header p{margin:4px 0 0;font-size:13px;color:#c7d1e6}
+  .searchbar{max-width:960px;margin:16px auto 0;padding:0 4px}
+  #q{
+    width:100%;font-size:17px;padding:13px 15px;border:2px solid var(--navy);
+    border-radius:10px;outline:none;background:#fff;color:var(--ink);
+  }
+  #q::placeholder{color:#9aa3b0}
+  main{max-width:960px;margin:0 auto;padding:14px 20px 60px}
+  .filters{margin:14px 0 6px}
+  .facet{margin:10px 0}
+  .facet h3{
+    margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--muted);font-weight:700;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    border:1px solid var(--line);background:var(--chip-bg);color:#2b3441;
+    padding:5px 11px;border-radius:999px;font-size:12.5px;cursor:pointer;
+    user-select:none;transition:all .12s;white-space:nowrap;
+  }
+  .chip:hover{border-color:#c3ccd9}
+  .chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .chip .n{opacity:.6;font-variant-numeric:tabular-nums;margin-left:5px;font-size:11px}
+  .chip.on .n{opacity:.85}
+  .facet select{
+    font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;color:var(--ink);max-width:100%;min-width:240px;
+  }
+  .toolbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin:18px 0 10px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap;
+  }
+  .count{font-size:13.5px;color:var(--muted)}
+  .count b{color:var(--navy)}
+  .clear{
+    font-size:12.5px;color:var(--navy);background:none;border:none;cursor:pointer;
+    text-decoration:underline;padding:0;
+  }
+  .clear[hidden]{display:none}
+  section.group{margin:6px 0 22px}
+  section.group > h2{
+    font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
+    border-bottom:1px solid var(--line);padding-bottom:5px;margin:0 0 10px;
+  }
+  .card{
+    border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:9px 0;
+    cursor:pointer;transition:border-color .12s,box-shadow .12s;background:#fff;
+  }
+  .card:hover{border-color:#c3ccd9;box-shadow:0 1px 4px rgba(31,56,100,.06)}
+  .card .top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .badge{
+    background:var(--navy);color:#fff;font-size:10.5px;font-weight:650;letter-spacing:.3px;
+    padding:2px 8px;border-radius:5px;text-transform:uppercase;white-space:nowrap;
+  }
+  .card .title{font-weight:650;font-size:14.5px;color:var(--ink)}
+  .card .year{font-size:12.5px;color:var(--muted)}
+  .card .snippet{font-size:13px;color:#38414d;margin-top:6px}
+  .card .full{margin-top:11px;border-top:1px dashed var(--line);padding-top:9px;display:none}
+  .card.open .full{display:block}
+  .card.open{border-color:var(--navy)}
+  .field{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:3px 0;font-size:13px}
+  .field .k{color:var(--muted);font-weight:600}
+  .field .v{white-space:pre-wrap;word-break:break-word}
+  .field .v a{color:var(--navy)}
+  /* Glossary cards — deliberately different look */
+  .gcard{
+    border:1px solid #d9c68a;border-left:5px solid #b8952f;background:#fffdf5;
+    border-radius:10px;padding:11px 14px;margin:9px 0;
+  }
+  .gcard .gterm{font-weight:700;color:#7a5c12;font-size:14.5px}
+  .gcard .gcat{
+    display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;
+    background:#f0e6c6;color:#7a5c12;padding:1px 7px;border-radius:5px;margin-left:8px;
+  }
+  .gcard .gdef{font-size:13px;color:#4a4632;margin-top:5px;white-space:pre-wrap}
+  .gcard .gwhere{font-size:11.5px;color:#8a7c52;margin-top:6px}
+  mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
+  .empty{color:var(--muted);font-size:14px;padding:30px 0;text-align:center}
+  footer{max-width:960px;margin:0 auto;padding:0 20px 40px;color:#9aa3b0;font-size:12px}
+  footer code{background:#f2f4f7;padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Merz Legal Crystal Ball</h1>
+    <p>Searchable index of pharmaceutical advertising &amp; enforcement records</p>
+    <div class="searchbar">
+      <input id="q" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Search companies, drugs, violations, quotes, glossary…" aria-label="Search">
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="filters" id="filters"></div>
+
+  <div class="toolbar">
+    <div class="count" id="count">Loading…</div>
+    <button class="clear" id="clear" hidden>Clear all filters</button>
+  </div>
+
+  <div id="glossary-results"></div>
+  <div id="record-results"></div>
+</main>
+
+<footer>
+  Data extracted read-only from the workbook by <code>parse.py</code>. This page reads <code>data.json</code>.
+</footer>
+
+<script>
+"use strict";
+
+// ---- Field-name helpers ----------------------------------------------------
+function pick(rec, names){
+  for(const n of names){ if(rec[n]!=null && rec[n]!=="") return rec[n]; }
+  return null;
+}
+const COMPANY_KEYS = ["Company","COMPANY"];
+const YEAR_KEYS    = ["Year","YEAR"];
+const DATE_KEYS    = ["Settlement Date","DATE","Date"];
+const VTYPE_KEYS   = ["Violation Type","VIOLATION TYPE","Doctrine"];
+const SNIPPET_KEYS = ["Summary","SUMMARY","Allegation Summary","Issue Summary",
+                      "WHAT THEY SAID","Notes","NOTES","Definition"];
+
+function extractYear(v){
+  if(v==null) return null;
+  if(typeof v==="number" && v>=1900 && v<=2100) return String(v);
+  const m = String(v).match(/(19|20)\d\d/);
+  return m ? m[0] : null;
+}
+
+// ---- Global state ----------------------------------------------------------
+let RECORDS = [], GLOSSARY = [];
+const active = { sheet:new Set(), company:new Set(), year:new Set(), vtype:new Set() };
+let query = "";
+
+const el = id => document.getElementById(id);
+
+// ---- Load ------------------------------------------------------------------
+fetch("data.json").then(r=>{
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
+}).then(data=>{
+  RECORDS = (data.records||[]).map(prep);
+  GLOSSARY = (data.glossary||[]).map(g=>{
+    const hay = [g.Term,g.Category,g.Definition,g["Where It Appears"]]
+                  .filter(Boolean).join("  ").toLowerCase();
+    return {...g, _hay:hay};
+  });
+  buildFilters();
+  wire();
+  render();
+}).catch(err=>{
+  el("count").textContent = "Could not load data.json — "+err.message
+    + '. Serve this folder over http (see README), not via file://.';
+});
+
+function prep(rec){
+  const company = pick(rec, COMPANY_KEYS);
+  const year = extractYear(pick(rec, YEAR_KEYS)) || extractYear(pick(rec, DATE_KEYS));
+  const vtype = pick(rec, VTYPE_KEYS);
+  // Title: company, else "Plaintiff v Defendant", else Challenger, else first entity
+  let title = company;
+  if(!title && rec.Plaintiff) title = rec.Plaintiff + (rec.Defendant? " v "+rec.Defendant : "");
+  if(!title && rec.Challenger) title = rec.Challenger + (rec.Advertiser? " v "+rec.Advertiser : "");
+  if(!title) title = "(untitled)";
+  // Haystack across every field value ( = separator so matches don't span fields)
+  const hay = Object.entries(rec)
+    .filter(([k])=>k!=="source_sheet")
+    .map(([,v])=>String(v)).join("  ").toLowerCase();
+  return {...rec, _company:company, _year:year?String(year):null,
+          _vtype:vtype, _title:title, _hay:hay};
+}
+
+// ---- Filters UI ------------------------------------------------------------
+function tally(getter){
+  const m = new Map();
+  for(const r of RECORDS){ const v=getter(r); if(v!=null && v!=="") m.set(v,(m.get(v)||0)+1); }
+  return m;
+}
+function sortedByCount(map){
+  return [...map.entries()].sort((a,b)=> b[1]-a[1] || String(a[0]).localeCompare(String(b[0])));
+}
+
+const SHEET_ORDER = ["DOJ Settlements","OPDP Warning Letters","OPDP Untitled Letters",
+  "Direct Quotes","Pharma v Pharma Lawsuits","NAD Challenges","TV Commercials",
+  "YouTube, Podcasts & Interviews","Online Video","Social Media","Banner & Display Ads",
+  "Sales Aids & Print","Email","Conferences & In-Person","Investor & Press"];
+
+function buildFilters(){
+  const box = el("filters");
+  box.innerHTML = "";
+
+  // Source sheet — chips (ordered)
+  const sheetMap = tally(r=>r.source_sheet);
+  const sheetEntries = SHEET_ORDER.filter(s=>sheetMap.has(s)).map(s=>[s,sheetMap.get(s)]);
+  box.appendChild(chipFacet("Source sheet", "sheet", sheetEntries));
+
+  // Violation type / doctrine — chips
+  box.appendChild(chipFacet("Violation type / doctrine", "vtype",
+      sortedByCount(tally(r=>r._vtype))));
+
+  // Year — chips (descending)
+  const yearEntries = [...tally(r=>r._year).entries()]
+      .sort((a,b)=> String(b[0]).localeCompare(String(a[0])));
+  box.appendChild(chipFacet("Year", "year", yearEntries));
+
+  // Company — dropdown (too many for chips)
+  box.appendChild(companyFacet(sortedByCount(tally(r=>r._company))
+      .sort((a,b)=> String(a[0]).localeCompare(String(b[0])))));
+}
+
+function chipFacet(label, key, entries){
+  const f = document.createElement("div"); f.className="facet";
+  const h = document.createElement("h3"); h.textContent=label; f.appendChild(h);
+  const wrap = document.createElement("div"); wrap.className="chips";
+  for(const [val,n] of entries){
+    const c = document.createElement("span"); c.className="chip";
+    c.innerHTML = escapeHtml(String(val)) + ' <span class="n">'+n+'</span>';
+    c.addEventListener("click", ()=>{
+      if(active[key].has(val)) active[key].delete(val); else active[key].add(val);
+      c.classList.toggle("on");
+      render();
+    });
+    c.dataset.val = String(val); c.dataset.key = key;
+    wrap.appendChild(c);
+  }
+  f.appendChild(wrap);
+  return f;
+}
+
+function companyFacet(entries){
+  const f = document.createElement("div"); f.className="facet";
+  const h = document.createElement("h3"); h.textContent="Company"; f.appendChild(h);
+  const sel = document.createElement("select"); sel.id="company-select";
+  const opt0 = document.createElement("option");
+  opt0.value=""; opt0.textContent="All companies ("+entries.length+")";
+  sel.appendChild(opt0);
+  for(const [val,n] of entries){
+    const o=document.createElement("option");
+    o.value=String(val); o.textContent=val+"  ("+n+")"; sel.appendChild(o);
+  }
+  sel.addEventListener("change", ()=>{
+    active.company = new Set(sel.value? [sel.value] : []);
+    render();
+  });
+  f.appendChild(sel);
+  return f;
+}
+
+// ---- Matching --------------------------------------------------------------
+function matchesFilters(r){
+  if(active.sheet.size   && !active.sheet.has(r.source_sheet)) return false;
+  if(active.company.size && !active.company.has(r._company))   return false;
+  if(active.year.size    && !active.year.has(r._year))         return false;
+  if(active.vtype.size   && !active.vtype.has(r._vtype))       return false;
+  return true;
+}
+function anyFilter(){
+  return active.sheet.size||active.company.size||active.year.size||active.vtype.size;
+}
+
+// ---- Render ----------------------------------------------------------------
+function wire(){
+  el("q").addEventListener("input", e=>{ query = e.target.value.trim().toLowerCase(); render(); });
+  el("clear").addEventListener("click", ()=>{
+    active.sheet.clear(); active.company.clear(); active.year.clear(); active.vtype.clear();
+    document.querySelectorAll(".chip.on").forEach(c=>c.classList.remove("on"));
+    const cs=el("company-select"); if(cs) cs.value="";
+    render();
+  });
+}
+
+function render(){
+  const recResults = RECORDS.filter(r => matchesFilters(r) && (!query || r._hay.includes(query)));
+  const glossResults = query ? GLOSSARY.filter(g => g._hay.includes(query)) : [];
+
+  // Count line
+  const sheets = new Set(recResults.map(r=>r.source_sheet));
+  let msg = `<b>${recResults.length}</b> result${recResults.length===1?"":"s"} across `
+          + `<b>${sheets.size}</b> sheet${sheets.size===1?"":"s"}`;
+  if(glossResults.length) msg += ` · <b>${glossResults.length}</b> glossary term${glossResults.length===1?"":"s"}`;
+  el("count").innerHTML = msg;
+  el("clear").hidden = !anyFilter() && !query;
+
+  // Glossary section
+  const gbox = el("glossary-results");
+  if(glossResults.length){
+    let html = '<section class="group"><h2>Glossary</h2>';
+    for(const g of glossResults) html += glossaryCard(g);
+    gbox.innerHTML = html + '</section>';
+  } else gbox.innerHTML = "";
+
+  // Records section
+  const rbox = el("record-results");
+  if(!recResults.length){
+    rbox.innerHTML = glossResults.length ? "" :
+      '<div class="empty">No matching records. Try a different search or clear filters.</div>';
+    return;
+  }
+  let html = glossResults.length ? '<section class="group"><h2>Records</h2>' : '<section class="group">';
+  for(const r of recResults) html += recordCard(r);
+  rbox.innerHTML = html + '</section>';
+
+  // Expand/collapse
+  rbox.querySelectorAll(".card").forEach(card=>{
+    card.addEventListener("click", ev=>{
+      if(ev.target.tagName==="A") return; // let links work
+      card.classList.toggle("open");
+    });
+  });
+}
+
+function recordCard(r){
+  const snip = snippetFor(r);
+  const year = r._year ? `<span class="year">· ${escapeHtml(r._year)}</span>` : "";
+  let full = "";
+  for(const [k,v] of Object.entries(r)){
+    if(k==="source_sheet" || k.startsWith("_")) continue;
+    full += `<div class="field"><div class="k">${escapeHtml(k)}</div>`
+          + `<div class="v">${linkify(hl(String(v)))}</div></div>`;
+  }
+  return `<div class="card">
+    <div class="top">
+      <span class="badge">${escapeHtml(r.source_sheet)}</span>
+      <span class="title">${hl(r._title)}</span>${year}
+    </div>
+    <div class="snippet">${snip}</div>
+    <div class="full">${full}</div>
+  </div>`;
+}
+
+function glossaryCard(g){
+  const cat = g.Category ? `<span class="gcat">${escapeHtml(g.Category)}</span>` : "";
+  const where = g["Where It Appears"]
+     ? `<div class="gwhere">Appears in: ${hl(g["Where It Appears"])}</div>` : "";
+  return `<div class="gcard">
+    <div><span class="gterm">${hl(g.Term||"")}</span>${cat}</div>
+    <div class="gdef">${hl(g.Definition||"")}</div>
+    ${where}
+  </div>`;
+}
+
+// Snippet: the field where the query matches (or a default field), windowed & highlighted.
+function snippetFor(r){
+  if(query){
+    for(const [k,v] of Object.entries(r)){
+      if(k==="source_sheet"||k.startsWith("_")) continue;
+      const s=String(v); const idx=s.toLowerCase().indexOf(query);
+      if(idx>=0) return `<em style="color:#8a94a3;font-style:normal">${escapeHtml(k)}:</em> `+window_(s, idx);
+    }
+  }
+  const def = pick(r, SNIPPET_KEYS);
+  if(def) return window_(String(def), 0);
+  return "";
+}
+function window_(s, idx){
+  const RAD=90;
+  let start = Math.max(0, idx-RAD), end = Math.min(s.length, idx+query.length+RAD);
+  let out = (start>0?"… ":"") + s.slice(start,end) + (end<s.length?" …":"");
+  out = out.replace(/\s*\n\s*/g," "); // collapse newlines in snippet
+  return hl(out);
+}
+
+// ---- Highlight & escape ----------------------------------------------------
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>(
+    {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function hl(s){
+  const esc = escapeHtml(s);
+  if(!query) return esc;
+  // Build a regex-safe needle and highlight on the escaped string.
+  const needle = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  try{ return esc.replace(new RegExp(needle,"gi"), m=>`<mark>${m}</mark>`); }
+  catch(e){ return esc; }
+}
+function linkify(html){
+  // html is already escaped/highlighted; turn bare URLs into links.
+  return html.replace(/(https?:\/\/[^\s<]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+}
+</script>
+</body>
+</html>
