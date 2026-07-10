@@ -3,153 +3,273 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Merz Legal Crystal Ball — Search</title>
+<title>Merz Legal Crystal Ball — Compliance Intelligence</title>
 <style>
   :root{
     --navy:#1F3864;
-    --navy-soft:#2f4a80;
-    --ink:#1a1a1a;
+    --navy-2:#2b4a80;
+    --navy-ink:#152747;
+    --ink:#1b2330;
     --muted:#5b6470;
-    --line:#e2e6ec;
-    --bg:#ffffff;
-    --chip-bg:#eef1f6;
-    --mark:#ffe08a;
+    --faint:#8a93a1;
+    --line:#e5e9f0;
+    --line-2:#eef1f6;
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --chip:#eef2f8;
+    --mark:#ffe082;
+    --gold:#b8952f;
+    --gold-bg:#fffdf5;
+    --gold-line:#e4d29a;
+    --shadow:0 1px 3px rgba(21,39,71,.06), 0 6px 24px rgba(21,39,71,.05);
+    --shadow-lg:0 12px 40px rgba(21,39,71,.16);
+    --radius:12px;
+    --fs:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);background:var(--bg);line-height:1.5;
-  }
+  html,body{margin:0;height:100%}
+  body{font-family:var(--fs);color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--navy)}
+  button{font-family:inherit}
+
+  /* ---------- Header ---------- */
   header{
-    background:var(--navy);color:#fff;padding:22px 20px 18px;
+    background:linear-gradient(180deg,var(--navy) 0%, var(--navy-ink) 100%);
+    color:#fff;position:sticky;top:0;z-index:40;
+    box-shadow:0 1px 0 rgba(255,255,255,.04), 0 6px 20px rgba(21,39,71,.18);
+    transition:padding .25s ease;
   }
-  header .wrap{max-width:960px;margin:0 auto}
-  header h1{margin:0;font-size:20px;letter-spacing:.2px;font-weight:650}
-  header p{margin:4px 0 0;font-size:13px;color:#c7d1e6}
-  .searchbar{max-width:960px;margin:16px auto 0;padding:0 4px}
+  .hwrap{max-width:1000px;margin:0 auto;padding:0 22px}
+  .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;padding-top:14px}
+  .brand .logo{
+    width:30px;height:30px;border-radius:8px;flex:none;
+    background:radial-gradient(120% 120% at 30% 20%, #4d6db3 0%, #24406f 70%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+    display:grid;place-items:center;font-weight:800;font-size:14px;color:#dbe6ff;letter-spacing:.5px;
+  }
+  .brand .name{font-size:15.5px;font-weight:680;letter-spacing:.2px}
+  .brand .sub{font-size:11px;color:#a9b8d6;font-weight:500;letter-spacing:.6px;text-transform:uppercase}
+  @media(max-width:560px){.brand .sub{display:none}}
+
+  /* hero (landing) vs slim */
+  .hero{text-align:center;padding:34px 22px 30px;transition:all .25s ease}
+  .hero h1{margin:0 0 6px;font-size:30px;font-weight:720;letter-spacing:-.4px}
+  .hero p{margin:0 auto 22px;font-size:14.5px;color:#c3d0ea;max-width:560px}
+  body:not(.route-landing) .hero{display:none}
+  body.route-landing .brand{display:none}
+
+  /* ---------- Search ---------- */
+  .search-shell{position:relative;max-width:640px;margin:0 auto;z-index:45}
+  body:not(.route-landing) .search-shell{max-width:560px;margin:0;padding:10px 0 12px}
+  body:not(.route-landing) .hwrap.search-row{display:flex;align-items:center;gap:16px}
+  .search-box{position:relative;display:flex;align-items:center}
+  .search-box svg{position:absolute;left:15px;width:18px;height:18px;color:var(--faint);pointer-events:none}
   #q{
-    width:100%;font-size:17px;padding:13px 15px;border:2px solid var(--navy);
-    border-radius:10px;outline:none;background:#fff;color:var(--ink);
+    width:100%;font-size:16px;padding:14px 96px 14px 44px;border:1.5px solid transparent;
+    border-radius:12px;outline:none;background:#fff;color:var(--ink);
+    box-shadow:0 8px 30px rgba(10,20,45,.28);transition:box-shadow .18s,border-color .18s;
   }
+  body:not(.route-landing) #q{padding:11px 74px 11px 42px;font-size:14.5px;box-shadow:0 4px 14px rgba(10,20,45,.22)}
+  #q:focus{border-color:#9fb4dd}
   #q::placeholder{color:#9aa3b0}
-  main{max-width:960px;margin:0 auto;padding:14px 20px 60px}
-  .filters{margin:14px 0 6px}
-  .facet{margin:10px 0}
-  .facet h3{
-    margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.7px;
-    color:var(--muted);font-weight:700;
+  .kbd-hint{position:absolute;right:12px;display:flex;gap:5px;pointer-events:none}
+  .kbd{font-size:11px;color:var(--faint);background:var(--chip);border:1px solid var(--line);
+    border-radius:5px;padding:1px 6px;font-family:ui-monospace,Menlo,monospace}
+  body:not(.route-landing) .kbd-hint .kbd.slash{display:none}
+
+  /* ---------- Dropdown ---------- */
+  #dropdown{
+    position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow-lg);max-height:70vh;overflow-y:auto;display:none;text-align:left;
   }
-  .chips{display:flex;flex-wrap:wrap;gap:7px}
-  .chip{
-    border:1px solid var(--line);background:var(--chip-bg);color:#2b3441;
-    padding:5px 11px;border-radius:999px;font-size:12.5px;cursor:pointer;
-    user-select:none;transition:all .12s;white-space:nowrap;
-  }
-  .chip:hover{border-color:#c3ccd9}
-  .chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .chip .n{opacity:.6;font-variant-numeric:tabular-nums;margin-left:5px;font-size:11px}
-  .chip.on .n{opacity:.85}
-  .facet select{
-    font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;
-    background:#fff;color:var(--ink);max-width:100%;min-width:240px;
-  }
-  .toolbar{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    margin:18px 0 10px;padding-top:12px;border-top:1px solid var(--line);flex-wrap:wrap;
-  }
-  .count{font-size:13.5px;color:var(--muted)}
-  .count b{color:var(--navy)}
-  .clear{
-    font-size:12.5px;color:var(--navy);background:none;border:none;cursor:pointer;
-    text-decoration:underline;padding:0;
-  }
-  .clear[hidden]{display:none}
-  section.group{margin:6px 0 22px}
-  section.group > h2{
-    font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
-    border-bottom:1px solid var(--line);padding-bottom:5px;margin:0 0 10px;
-  }
-  .card{
-    border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:9px 0;
-    cursor:pointer;transition:border-color .12s,box-shadow .12s;background:#fff;
-  }
-  .card:hover{border-color:#c3ccd9;box-shadow:0 1px 4px rgba(31,56,100,.06)}
-  .card .top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-  .badge{
-    background:var(--navy);color:#fff;font-size:10.5px;font-weight:650;letter-spacing:.3px;
-    padding:2px 8px;border-radius:5px;text-transform:uppercase;white-space:nowrap;
-  }
-  .card .title{font-weight:650;font-size:14.5px;color:var(--ink)}
-  .card .year{font-size:12.5px;color:var(--muted)}
-  .card .snippet{font-size:13px;color:#38414d;margin-top:6px}
-  .card .full{margin-top:11px;border-top:1px dashed var(--line);padding-top:9px;display:none}
-  .card.open .full{display:block}
-  .card.open{border-color:var(--navy)}
-  .field{display:grid;grid-template-columns:150px 1fr;gap:10px;padding:3px 0;font-size:13px}
-  .field .k{color:var(--muted);font-weight:600}
-  .field .v{white-space:pre-wrap;word-break:break-word}
-  .field .v a{color:var(--navy)}
-  /* Glossary cards — deliberately different look */
-  .gcard{
-    border:1px solid #d9c68a;border-left:5px solid #b8952f;background:#fffdf5;
-    border-radius:10px;padding:11px 14px;margin:9px 0;
-  }
-  .gcard .gterm{font-weight:700;color:#7a5c12;font-size:14.5px}
-  .gcard .gcat{
-    display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;
-    background:#f0e6c6;color:#7a5c12;padding:1px 7px;border-radius:5px;margin-left:8px;
-  }
-  .gcard .gdef{font-size:13px;color:#4a4632;margin-top:5px;white-space:pre-wrap}
-  .gcard .gwhere{font-size:11.5px;color:#8a7c52;margin-top:6px}
+  #dropdown.open{display:block}
+  .dd-head{display:flex;justify-content:space-between;align-items:center;padding:9px 15px;
+    border-bottom:1px solid var(--line-2);position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0}
+  .dd-head .cnt{font-size:12px;color:var(--muted)}
+  .dd-head .cnt b{color:var(--navy)}
+  .dd-sec{padding:6px 0}
+  .dd-sec + .dd-sec{border-top:1px solid var(--line-2)}
+  .dd-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);
+    font-weight:700;padding:8px 15px 4px}
+  .dd-item{display:flex;align-items:center;gap:11px;padding:9px 15px;cursor:pointer;transition:background .1s}
+  .dd-item:hover,.dd-item.active{background:#eef3fb}
+  .dd-item.active{box-shadow:inset 3px 0 0 var(--navy)}
+  .dd-ico{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-size:12px;font-weight:700;background:var(--chip);color:var(--navy)}
+  .dd-ico.company{background:#e6eefb;color:var(--navy)}
+  .dd-main{min-width:0;flex:1}
+  .dd-title{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dd-meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dd-badge{font-size:9.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:#fff;
+    background:var(--navy);border-radius:5px;padding:2px 7px;flex:none}
+  .dd-chev{color:var(--faint);flex:none;font-size:16px}
+  .dd-empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:13.5px}
+  /* glossary card inside dropdown */
+  .gcard{border:1px solid var(--gold-line);border-left:4px solid var(--gold);background:var(--gold-bg);
+    border-radius:10px;padding:10px 13px;margin:6px 15px}
+  .gcard .gterm{font-weight:700;color:#7a5c12;font-size:14px}
+  .gcard .gcat{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.4px;
+    background:#f0e6c6;color:#7a5c12;padding:1px 7px;border-radius:5px;margin-left:8px}
+  .gcard .gdef{font-size:12.5px;color:#4a4632;margin-top:4px;white-space:pre-wrap}
+  .gcard .gwhere{font-size:11px;color:#8a7c52;margin-top:5px}
+
+  /* ---------- Body / views ---------- */
+  main{max-width:1000px;margin:0 auto;padding:26px 22px 80px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px auto 0;max-width:760px}
+  @media(max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px;
+    box-shadow:var(--shadow);text-align:center}
+  .tile .v{font-size:24px;font-weight:750;color:var(--navy);letter-spacing:-.5px;line-height:1.1}
+  .tile .l{font-size:11.5px;color:var(--muted);margin-top:5px;letter-spacing:.2px}
+  .hint{text-align:center;color:var(--faint);font-size:12.5px;margin-top:28px}
+  .hint .kbd{margin:0 2px}
+
+  /* back bar */
+  .backbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .btn-back{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
+    color:var(--navy);font-size:13px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer;
+    box-shadow:var(--shadow);transition:border-color .12s,transform .05s}
+  .btn-back:hover{border-color:#bccae4}
+  .btn-back:active{transform:translateY(1px)}
+
+  /* company profile */
+  .profile-head{background:linear-gradient(135deg,#fff 0%, #f2f6fc 100%);border:1px solid var(--line);
+    border-radius:16px;padding:22px 24px;box-shadow:var(--shadow);margin-bottom:20px}
+  .profile-head h1{margin:0;font-size:26px;font-weight:730;letter-spacing:-.4px;color:var(--navy-ink)}
+  .profile-head .variants{font-size:12px;color:var(--muted);margin-top:6px}
+  .profile-head .variants b{color:var(--ink);font-weight:600}
+  .pstats{display:flex;flex-wrap:wrap;gap:20px;margin-top:18px}
+  .pstat{min-width:90px}
+  .pstat .v{font-size:20px;font-weight:730;color:var(--navy);letter-spacing:-.3px}
+  .pstat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow)}
+  .panel h2{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
+    font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+  .panel h2 .sum{color:var(--navy);font-size:13px;font-weight:700;text-transform:none;letter-spacing:0}
+
+  /* timeline */
+  .timeline{display:flex;align-items:flex-end;gap:6px;height:96px;padding-top:6px}
+  .tl-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+  .tl-bar{width:70%;max-width:26px;background:linear-gradient(180deg,#3a5896,#1F3864);border-radius:4px 4px 2px 2px;
+    min-height:3px;transition:height .3s ease;position:relative}
+  .tl-bar span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted);font-weight:600}
+  .tl-yr{font-size:10px;color:var(--faint);white-space:nowrap}
+  /* violation bars */
+  .vbar{margin:9px 0}
+  .vbar .vl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px}
+  .vbar .vl .vn{color:var(--ink)}
+  .vbar .vl .vc{color:var(--muted);font-variant-numeric:tabular-nums}
+  .vbar .track{height:7px;background:var(--line-2);border-radius:5px;overflow:hidden}
+  .vbar .fill{height:100%;background:linear-gradient(90deg,#3a5896,#1F3864);border-radius:5px}
+
+  /* record rows */
+  .section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+  .section > h2{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
+    font-weight:700;padding:14px 18px;border-bottom:1px solid var(--line-2);display:flex;justify-content:space-between;align-items:baseline}
+  .section > h2 .sum{color:var(--navy);font-size:13px;font-weight:700;text-transform:none;letter-spacing:0}
+  .row{display:flex;gap:13px;padding:13px 18px;cursor:pointer;border-bottom:1px solid var(--line-2);transition:background .1s}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:#f5f8fd}
+  .row .rl{flex:none;width:120px}
+  .row .rdate{font-size:12.5px;font-weight:650;color:var(--navy)}
+  .row .rtag{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .row .rbadge{display:inline-block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;
+    padding:1px 6px;border-radius:4px;margin-top:4px}
+  .rbadge.warn{background:#fbe6e6;color:#a12b2b}
+  .rbadge.untitled{background:#fdf0dd;color:#8a5a12}
+  .row .rm{min-width:0;flex:1}
+  .row .rtitle{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .row .rsnip{font-size:12.5px;color:#414b58;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .row .rchev{color:var(--faint);align-self:center;flex:none}
+  .empty-view{text-align:center;color:var(--muted);padding:50px 0}
+
+  /* ---------- Record slide-over ---------- */
+  #backdrop{position:fixed;inset:0;background:rgba(16,26,48,.42);backdrop-filter:blur(2px);z-index:60;
+    opacity:0;pointer-events:none;transition:opacity .2s}
+  #backdrop.open{opacity:1;pointer-events:auto}
+  #panel{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--bg);z-index:61;
+    box-shadow:-16px 0 50px rgba(16,26,48,.28);transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+    display:flex;flex-direction:column}
+  #panel.open{transform:translateX(0)}
+  .panel-top{background:var(--navy);color:#fff;padding:18px 20px;display:flex;align-items:flex-start;gap:12px}
+  .panel-top .pt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+    background:rgba(255,255,255,.16);padding:3px 9px;border-radius:6px;display:inline-block;margin-bottom:7px}
+  .panel-top h2{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+  .panel-close{margin-left:auto;background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;
+    border-radius:8px;font-size:18px;cursor:pointer;flex:none;line-height:1;transition:background .12s}
+  .panel-close:hover{background:rgba(255,255,255,.24)}
+  .panel-body{padding:16px 20px 40px;overflow-y:auto}
+  .field{padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .field:last-child{border-bottom:none}
+  .field .k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:700;margin-bottom:4px}
+  .field .v{font-size:13.5px;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .field .v a{color:var(--navy);word-break:break-all}
+  .panel-cta{margin-top:16px}
+  .panel-cta a{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--navy);
+    text-decoration:none;border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:9px;box-shadow:var(--shadow)}
+
   mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
-  .empty{color:var(--muted);font-size:14px;padding:30px 0;text-align:center}
-  footer{max-width:960px;margin:0 auto;padding:0 20px 40px;color:#9aa3b0;font-size:12px}
-  footer code{background:#f2f4f7;padding:1px 5px;border-radius:4px}
+  .loading{text-align:center;color:var(--muted);padding:60px 0}
 </style>
 </head>
-<body>
+<body class="route-landing">
 <header>
-  <div class="wrap">
-    <h1>Merz Legal Crystal Ball</h1>
-    <p>Searchable index of pharmaceutical advertising &amp; enforcement records</p>
-    <div class="searchbar">
-      <input id="q" type="search" autocomplete="off" spellcheck="false"
-             placeholder="Search companies, drugs, violations, quotes, glossary…" aria-label="Search">
+  <div class="hwrap search-row">
+    <div class="brand" id="brand">
+      <div class="logo">MC</div>
+      <div>
+        <div class="name">Merz Legal Crystal Ball</div>
+        <div class="sub">Compliance Intelligence</div>
+      </div>
+    </div>
+    <div class="hero">
+      <h1>Merz Legal Crystal Ball</h1>
+      <p>Search pharmaceutical advertising enforcement — settlements, FDA letters, lawsuits, and promotional claims — by company, record, or term.</p>
+    </div>
+    <div class="search-shell">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Search companies, records, or glossary terms…" aria-label="Search">
+        <div class="kbd-hint"><span class="kbd slash">/</span><span class="kbd">⌘K</span></div>
+      </div>
+      <div id="dropdown" role="listbox"></div>
     </div>
   </div>
 </header>
 
-<main>
-  <div class="filters" id="filters"></div>
+<main id="app"><div class="loading">Loading compliance data…</div></main>
 
-  <div class="toolbar">
-    <div class="count" id="count">Loading…</div>
-    <button class="clear" id="clear" hidden>Clear all filters</button>
-  </div>
-
-  <div id="glossary-results"></div>
-  <div id="record-results"></div>
-</main>
-
-<footer>
-  Data extracted read-only from the workbook by <code>parse.py</code>. This page reads <code>data.json</code>.
-</footer>
+<div id="backdrop"></div>
+<aside id="panel" aria-hidden="true"></aside>
 
 <script>
 "use strict";
 
-// ---- Field-name helpers ----------------------------------------------------
-function pick(rec, names){
-  for(const n of names){ if(rec[n]!=null && rec[n]!=="") return rec[n]; }
-  return null;
-}
+/* =========================================================================
+   Data model & indexing
+   ========================================================================= */
+let RECORDS = [], GLOSSARY = [];
+let COMPANIES = new Map();      // key -> bucket
+let STATS = {};
+let currentBaseHash = "#/";
+
+const CHANNEL_SHEETS = new Set(["TV Commercials","YouTube, Podcasts & Interviews",
+  "Online Video","Social Media","Banner & Display Ads","Sales Aids & Print","Email",
+  "Conferences & In-Person","Investor & Press"]);
+
+const el = id => document.getElementById(id);
+const pick = (rec, keys) => { for(const k of keys){ if(rec[k]!=null && rec[k]!=="") return rec[k]; } return null; };
+
 const COMPANY_KEYS = ["Company","COMPANY"];
-const YEAR_KEYS    = ["Year","YEAR"];
-const DATE_KEYS    = ["Settlement Date","DATE","Date"];
-const VTYPE_KEYS   = ["Violation Type","VIOLATION TYPE","Doctrine"];
-const SNIPPET_KEYS = ["Summary","SUMMARY","Allegation Summary","Issue Summary",
-                      "WHAT THEY SAID","Notes","NOTES","Definition"];
+const YEAR_KEYS = ["Year","YEAR"];
+const DATE_KEYS = ["Settlement Date","DATE","Date"];
+const VTYPE_KEYS = ["Violation Type","VIOLATION TYPE","Doctrine","Violation Category","VIOLATION CATEGORY"];
 
 function extractYear(v){
   if(v==null) return null;
@@ -157,257 +277,628 @@ function extractYear(v){
   const m = String(v).match(/(19|20)\d\d/);
   return m ? m[0] : null;
 }
+function recYear(rec){ return extractYear(pick(rec,YEAR_KEYS)) || extractYear(pick(rec,DATE_KEYS)); }
+function recDate(rec){ return pick(rec, ["Settlement Date","DATE","Date"]); }
 
-// ---- Global state ----------------------------------------------------------
-let RECORDS = [], GLOSSARY = [];
-const active = { sheet:new Set(), company:new Set(), year:new Set(), vtype:new Set() };
-let query = "";
+function recTitle(rec){
+  const c = pick(rec, COMPANY_KEYS);
+  if(c) return c;
+  if(rec.Plaintiff) return rec.Plaintiff + (rec.Defendant ? " v. " + rec.Defendant : "");
+  if(rec.Challenger) return rec.Challenger + (rec.Advertiser ? " v. " + rec.Advertiser : "");
+  return "(untitled)";
+}
 
-const el = id => document.getElementById(id);
+const CORP_STOP = new RegExp("\\b(inc|incorporated|corp|corporation|company|co|llc|lp|llp|plc|ltd|"
+  + "gmbh|usa|us|pharmaceuticals?|pharma|biopharma|healthcare|health|therapeutics|biosciences?|"
+  + "biotech|medicines?|laboratories|labs|holdings|group|consumer)\\b","g");
 
-// ---- Load ------------------------------------------------------------------
-fetch("data.json").then(r=>{
-  if(!r.ok) throw new Error("HTTP "+r.status);
-  return r.json();
-}).then(data=>{
-  RECORDS = (data.records||[]).map(prep);
-  GLOSSARY = (data.glossary||[]).map(g=>{
-    const hay = [g.Term,g.Category,g.Definition,g["Where It Appears"]]
-                  .filter(Boolean).join("  ").toLowerCase();
-    return {...g, _hay:hay};
+// Normalize a company name to a merge key: drop parentheticals + corporate suffixes.
+function normCompany(name){
+  let s = String(name).toLowerCase();
+  s = s.replace(/\([^)]*\)/g," ");          // drop "(copay foundation)", "(Parke-Davis)", etc.
+  s = s.replace(/[.,/&'"’–—-]/g," ");
+  s = s.replace(CORP_STOP," ");
+  s = s.replace(/\s+/g," ").trim();
+  return s;
+}
+// The "primary" display form of a raw name (parentheticals removed, trimmed).
+function primaryName(name){
+  return String(name).replace(/\([^)]*\)/g,"").replace(/\s+/g," ").trim() || String(name).trim();
+}
+// Score a display candidate: lower is better (prefer mixed-case, no parens, short).
+function displayScore(name){
+  let s = name.length;
+  if(name === name.toUpperCase() && /[A-Z]/.test(name)) s += 40; // penalize ALL CAPS
+  if(/[()]/.test(name)) s += 60;
+  return s;
+}
+
+function buildIndex(){
+  RECORDS.forEach((rec, i)=>{
+    rec._id = i;
+    rec._title = recTitle(rec);
+    rec._year = recYear(rec);
+    rec._hay = Object.entries(rec).filter(([k])=>k!=="source_sheet" && !k.startsWith("_"))
+                 .map(([,v])=>String(v)).join("  ").toLowerCase();
   });
-  buildFilters();
-  wire();
-  render();
-}).catch(err=>{
-  el("count").textContent = "Could not load data.json — "+err.message
-    + '. Serve this folder over http (see README), not via file://.';
-});
 
-function prep(rec){
-  const company = pick(rec, COMPANY_KEYS);
-  const year = extractYear(pick(rec, YEAR_KEYS)) || extractYear(pick(rec, DATE_KEYS));
-  const vtype = pick(rec, VTYPE_KEYS);
-  // Title: company, else "Plaintiff v Defendant", else Challenger, else first entity
-  let title = company;
-  if(!title && rec.Plaintiff) title = rec.Plaintiff + (rec.Defendant? " v "+rec.Defendant : "");
-  if(!title && rec.Challenger) title = rec.Challenger + (rec.Advertiser? " v "+rec.Advertiser : "");
-  if(!title) title = "(untitled)";
-  // Haystack across every field value ( = separator so matches don't span fields)
-  const hay = Object.entries(rec)
-    .filter(([k])=>k!=="source_sheet")
-    .map(([,v])=>String(v)).join("  ").toLowerCase();
-  return {...rec, _company:company, _year:year?String(year):null,
-          _vtype:vtype, _title:title, _hay:hay};
-}
+  // company associations: [rawName, role]
+  for(const rec of RECORDS){
+    const assoc = [];
+    const c = pick(rec, COMPANY_KEYS);
+    if(c) assoc.push([c,"company"]);
+    if(rec.Plaintiff) assoc.push([rec.Plaintiff,"plaintiff"]);
+    if(rec.Defendant) assoc.push([rec.Defendant,"defendant"]);
+    if(rec.Challenger) assoc.push([rec.Challenger,"challenger"]);
+    if(rec.Advertiser) assoc.push([rec.Advertiser,"advertiser"]);
 
-// ---- Filters UI ------------------------------------------------------------
-function tally(getter){
-  const m = new Map();
-  for(const r of RECORDS){ const v=getter(r); if(v!=null && v!=="") m.set(v,(m.get(v)||0)+1); }
-  return m;
-}
-function sortedByCount(map){
-  return [...map.entries()].sort((a,b)=> b[1]-a[1] || String(a[0]).localeCompare(String(b[0])));
-}
-
-const SHEET_ORDER = ["DOJ Settlements","OPDP Warning Letters","OPDP Untitled Letters",
-  "Direct Quotes","Pharma v Pharma Lawsuits","NAD Challenges","TV Commercials",
-  "YouTube, Podcasts & Interviews","Online Video","Social Media","Banner & Display Ads",
-  "Sales Aids & Print","Email","Conferences & In-Person","Investor & Press"];
-
-function buildFilters(){
-  const box = el("filters");
-  box.innerHTML = "";
-
-  // Source sheet — chips (ordered)
-  const sheetMap = tally(r=>r.source_sheet);
-  const sheetEntries = SHEET_ORDER.filter(s=>sheetMap.has(s)).map(s=>[s,sheetMap.get(s)]);
-  box.appendChild(chipFacet("Source sheet", "sheet", sheetEntries));
-
-  // Violation type / doctrine — chips
-  box.appendChild(chipFacet("Violation type / doctrine", "vtype",
-      sortedByCount(tally(r=>r._vtype))));
-
-  // Year — chips (descending)
-  const yearEntries = [...tally(r=>r._year).entries()]
-      .sort((a,b)=> String(b[0]).localeCompare(String(a[0])));
-  box.appendChild(chipFacet("Year", "year", yearEntries));
-
-  // Company — dropdown (too many for chips)
-  box.appendChild(companyFacet(sortedByCount(tally(r=>r._company))
-      .sort((a,b)=> String(a[0]).localeCompare(String(b[0])))));
-}
-
-function chipFacet(label, key, entries){
-  const f = document.createElement("div"); f.className="facet";
-  const h = document.createElement("h3"); h.textContent=label; f.appendChild(h);
-  const wrap = document.createElement("div"); wrap.className="chips";
-  for(const [val,n] of entries){
-    const c = document.createElement("span"); c.className="chip";
-    c.innerHTML = escapeHtml(String(val)) + ' <span class="n">'+n+'</span>';
-    c.addEventListener("click", ()=>{
-      if(active[key].has(val)) active[key].delete(val); else active[key].add(val);
-      c.classList.toggle("on");
-      render();
-    });
-    c.dataset.val = String(val); c.dataset.key = key;
-    wrap.appendChild(c);
-  }
-  f.appendChild(wrap);
-  return f;
-}
-
-function companyFacet(entries){
-  const f = document.createElement("div"); f.className="facet";
-  const h = document.createElement("h3"); h.textContent="Company"; f.appendChild(h);
-  const sel = document.createElement("select"); sel.id="company-select";
-  const opt0 = document.createElement("option");
-  opt0.value=""; opt0.textContent="All companies ("+entries.length+")";
-  sel.appendChild(opt0);
-  for(const [val,n] of entries){
-    const o=document.createElement("option");
-    o.value=String(val); o.textContent=val+"  ("+n+")"; sel.appendChild(o);
-  }
-  sel.addEventListener("change", ()=>{
-    active.company = new Set(sel.value? [sel.value] : []);
-    render();
-  });
-  f.appendChild(sel);
-  return f;
-}
-
-// ---- Matching --------------------------------------------------------------
-function matchesFilters(r){
-  if(active.sheet.size   && !active.sheet.has(r.source_sheet)) return false;
-  if(active.company.size && !active.company.has(r._company))   return false;
-  if(active.year.size    && !active.year.has(r._year))         return false;
-  if(active.vtype.size   && !active.vtype.has(r._vtype))       return false;
-  return true;
-}
-function anyFilter(){
-  return active.sheet.size||active.company.size||active.year.size||active.vtype.size;
-}
-
-// ---- Render ----------------------------------------------------------------
-function wire(){
-  el("q").addEventListener("input", e=>{ query = e.target.value.trim().toLowerCase(); render(); });
-  el("clear").addEventListener("click", ()=>{
-    active.sheet.clear(); active.company.clear(); active.year.clear(); active.vtype.clear();
-    document.querySelectorAll(".chip.on").forEach(c=>c.classList.remove("on"));
-    const cs=el("company-select"); if(cs) cs.value="";
-    render();
-  });
-}
-
-function render(){
-  const recResults = RECORDS.filter(r => matchesFilters(r) && (!query || r._hay.includes(query)));
-  const glossResults = query ? GLOSSARY.filter(g => g._hay.includes(query)) : [];
-
-  // Count line
-  const sheets = new Set(recResults.map(r=>r.source_sheet));
-  let msg = `<b>${recResults.length}</b> result${recResults.length===1?"":"s"} across `
-          + `<b>${sheets.size}</b> sheet${sheets.size===1?"":"s"}`;
-  if(glossResults.length) msg += ` · <b>${glossResults.length}</b> glossary term${glossResults.length===1?"":"s"}`;
-  el("count").innerHTML = msg;
-  el("clear").hidden = !anyFilter() && !query;
-
-  // Glossary section
-  const gbox = el("glossary-results");
-  if(glossResults.length){
-    let html = '<section class="group"><h2>Glossary</h2>';
-    for(const g of glossResults) html += glossaryCard(g);
-    gbox.innerHTML = html + '</section>';
-  } else gbox.innerHTML = "";
-
-  // Records section
-  const rbox = el("record-results");
-  if(!recResults.length){
-    rbox.innerHTML = glossResults.length ? "" :
-      '<div class="empty">No matching records. Try a different search or clear filters.</div>';
-    return;
-  }
-  let html = glossResults.length ? '<section class="group"><h2>Records</h2>' : '<section class="group">';
-  for(const r of recResults) html += recordCard(r);
-  rbox.innerHTML = html + '</section>';
-
-  // Expand/collapse
-  rbox.querySelectorAll(".card").forEach(card=>{
-    card.addEventListener("click", ev=>{
-      if(ev.target.tagName==="A") return; // let links work
-      card.classList.toggle("open");
-    });
-  });
-}
-
-function recordCard(r){
-  const snip = snippetFor(r);
-  const year = r._year ? `<span class="year">· ${escapeHtml(r._year)}</span>` : "";
-  let full = "";
-  for(const [k,v] of Object.entries(r)){
-    if(k==="source_sheet" || k.startsWith("_")) continue;
-    full += `<div class="field"><div class="k">${escapeHtml(k)}</div>`
-          + `<div class="v">${linkify(hl(String(v)))}</div></div>`;
-  }
-  return `<div class="card">
-    <div class="top">
-      <span class="badge">${escapeHtml(r.source_sheet)}</span>
-      <span class="title">${hl(r._title)}</span>${year}
-    </div>
-    <div class="snippet">${snip}</div>
-    <div class="full">${full}</div>
-  </div>`;
-}
-
-function glossaryCard(g){
-  const cat = g.Category ? `<span class="gcat">${escapeHtml(g.Category)}</span>` : "";
-  const where = g["Where It Appears"]
-     ? `<div class="gwhere">Appears in: ${hl(g["Where It Appears"])}</div>` : "";
-  return `<div class="gcard">
-    <div><span class="gterm">${hl(g.Term||"")}</span>${cat}</div>
-    <div class="gdef">${hl(g.Definition||"")}</div>
-    ${where}
-  </div>`;
-}
-
-// Snippet: the field where the query matches (or a default field), windowed & highlighted.
-function snippetFor(r){
-  if(query){
-    for(const [k,v] of Object.entries(r)){
-      if(k==="source_sheet"||k.startsWith("_")) continue;
-      const s=String(v); const idx=s.toLowerCase().indexOf(query);
-      if(idx>=0) return `<em style="color:#8a94a3;font-style:normal">${escapeHtml(k)}:</em> `+window_(s, idx);
+    const seen = new Set();
+    for(const [raw, role] of assoc){
+      const key = normCompany(raw);
+      if(!key || seen.has(key)) continue;
+      seen.add(key);
+      let b = COMPANIES.get(key);
+      if(!b){ b = {key, names:new Map(), records:[]}; COMPANIES.set(key, b); }
+      const disp = primaryName(raw);
+      b.names.set(disp, (b.names.get(disp)||0)+1);
+      b.records.push({rec, role});
     }
   }
-  const def = pick(r, SNIPPET_KEYS);
-  if(def) return window_(String(def), 0);
-  return "";
-}
-function window_(s, idx){
-  const RAD=90;
-  let start = Math.max(0, idx-RAD), end = Math.min(s.length, idx+query.length+RAD);
-  let out = (start>0?"… ":"") + s.slice(start,end) + (end<s.length?" …":"");
-  out = out.replace(/\s*\n\s*/g," "); // collapse newlines in snippet
-  return hl(out);
+
+  // choose display name + compute per-company summary
+  for(const b of COMPANIES.values()){
+    let best=null, bestScore=Infinity;
+    for(const nm of b.names.keys()){ const sc=displayScore(nm); if(sc<bestScore){bestScore=sc;best=nm;} }
+    b.display = best;
+    b.variants = [...b.names.keys()].filter(n=>n!==best);
+    b.summary = summarize(b);
+    b._searchNames = [best, ...b.names.keys()].map(s=>s.toLowerCase());
+  }
+
+  // global stats
+  const doj = RECORDS.filter(r=>r.source_sheet==="DOJ Settlements");
+  STATS.records = RECORDS.length;
+  STATS.companies = COMPANIES.size;
+  STATS.dojTotal = doj.reduce((a,r)=> a + (typeof r["Total Amount"]==="number"? r["Total Amount"]:0), 0);
+  STATS.glossary = GLOSSARY.length;
 }
 
-// ---- Highlight & escape ----------------------------------------------------
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, c=>(
-    {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function catOf(sheet){
+  if(sheet==="DOJ Settlements") return "doj";
+  if(sheet==="OPDP Warning Letters"||sheet==="OPDP Untitled Letters") return "letter";
+  if(sheet==="Direct Quotes") return "quote";
+  if(sheet==="Pharma v Pharma Lawsuits") return "lawsuit";
+  if(sheet==="NAD Challenges") return "nad";
+  if(CHANNEL_SHEETS.has(sheet)) return "channel";
+  return "other";
 }
+
+function summarize(b){
+  const s = {doj:0, dojTotal:0, letters:0, quotes:0, lawsuits:0, nad:0, channels:0, total:b.records.length};
+  for(const {rec} of b.records){
+    switch(catOf(rec.source_sheet)){
+      case "doj": s.doj++; if(typeof rec["Total Amount"]==="number") s.dojTotal+=rec["Total Amount"]; break;
+      case "letter": s.letters++; break;
+      case "quote": s.quotes++; break;
+      case "lawsuit": s.lawsuits++; break;
+      case "nad": s.nad++; break;
+      case "channel": s.channels++; break;
+    }
+  }
+  return s;
+}
+
+/* =========================================================================
+   Formatting & text helpers
+   ========================================================================= */
+function fmtMoney(n){
+  if(!n) return "$0";
+  const a = Math.abs(n);
+  if(a>=1e9) return "$" + (n/1e9).toFixed(2).replace(/\.?0+$/,"") + "B";
+  if(a>=1e6) return "$" + Math.round(n/1e6) + "M";
+  if(a>=1e3) return "$" + Math.round(n/1e3) + "K";
+  return "$" + n;
+}
+function fmtMoneyFull(n){ return "$" + Number(n).toLocaleString("en-US"); }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+let HLQ = "";
 function hl(s){
   const esc = escapeHtml(s);
-  if(!query) return esc;
-  // Build a regex-safe needle and highlight on the escaped string.
-  const needle = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-  try{ return esc.replace(new RegExp(needle,"gi"), m=>`<mark>${m}</mark>`); }
+  if(!HLQ) return esc;
+  const needle = escapeHtml(HLQ).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  try{ return esc.replace(new RegExp(needle,"gi"), m=>"<mark>"+m+"</mark>"); }
   catch(e){ return esc; }
 }
-function linkify(html){
-  // html is already escaped/highlighted; turn bare URLs into links.
-  return html.replace(/(https?:\/\/[^\s<]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+function linkify(escapedHtml){
+  return escapedHtml.replace(/(https?:\/\/[^\s<]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
 }
+function snippet(text, q, radius){
+  radius = radius || 90;
+  let s = String(text).replace(/\s*\n\s*/g," ");
+  if(q){
+    const idx = s.toLowerCase().indexOf(q.toLowerCase());
+    if(idx>=0){
+      const start=Math.max(0,idx-radius), end=Math.min(s.length, idx+q.length+radius);
+      s = (start>0?"… ":"") + s.slice(start,end) + (end<s.length?" …":"");
+    } else if(s.length>2*radius){ s = s.slice(0,2*radius) + " …"; }
+  } else if(s.length>2*radius){ s = s.slice(0,2*radius) + " …"; }
+  return s;
+}
+
+/* =========================================================================
+   Fuzzy matching
+   ========================================================================= */
+// returns a score (higher better) or null
+function matchScore(text, q){
+  text = text.toLowerCase();
+  const i = text.indexOf(q);
+  if(i===0) return 1000;
+  if(i>0){ const wb = /\W|_/.test(text[i-1]); return (wb?820:640) - Math.min(i,200); }
+  // subsequence fuzzy
+  let ti=0, qi=0, gaps=0, last=-2, started=false;
+  for(; ti<text.length && qi<q.length; ti++){
+    if(text[ti]===q[qi]){ if(started && ti!==last+1) gaps++; started=true; last=ti; qi++; }
+  }
+  if(qi===q.length) return 240 - gaps*4;
+  return null;
+}
+
+function searchAll(raw){
+  const q = raw.trim().toLowerCase();
+  if(!q) return {companies:[], records:[], glossary:[], total:0};
+
+  // companies
+  const comp = [];
+  for(const b of COMPANIES.values()){
+    let best=null;
+    for(const nm of b._searchNames){ const sc=matchScore(nm,q); if(sc!=null && (best==null||sc>best)) best=sc; }
+    if(best!=null) comp.push([best + Math.min(b.records.length,20), b]);
+  }
+  comp.sort((a,b)=> b[0]-a[0]);
+
+  // records
+  const recs = [];
+  for(const r of RECORDS){
+    const st = matchScore(r._title, q);
+    const sh = matchScore(r._hay, q);
+    let sc = null;
+    if(st!=null) sc = st + 120;
+    else if(sh!=null) sc = sh;
+    if(sc!=null) recs.push([sc, r]);
+  }
+  recs.sort((a,b)=> b[0]-a[0]);
+
+  // glossary
+  const gl = [];
+  for(const g of GLOSSARY){
+    const stt = matchScore(g.Term||"", q);
+    const sd = matchScore(g.Definition||"", q);
+    let sc = null;
+    if(stt!=null) sc = stt + 120; else if(sd!=null) sc = sd;
+    if(sc!=null) gl.push([sc, g]);
+  }
+  gl.sort((a,b)=> b[0]-a[0]);
+
+  return {
+    companies: comp.slice(0,6).map(x=>x[1]),
+    records: recs.slice(0,8).map(x=>x[1]),
+    glossary: gl.slice(0,5).map(x=>x[1]),
+    total: comp.length + recs.length + gl.length
+  };
+}
+
+/* =========================================================================
+   Dropdown UI + keyboard nav
+   ========================================================================= */
+let navItems = [];       // [{kind:'company'|'record', ...}]
+let activeIndex = -1;
+let debounceT = null;
+
+function renderDropdown(){
+  const q = el("q").value;
+  HLQ = q.trim();
+  const dd = el("dropdown");
+  if(!HLQ){ dd.classList.remove("open"); dd.innerHTML=""; navItems=[]; activeIndex=-1; return; }
+
+  const res = searchAll(q);
+  navItems = []; let idx = 0;
+  let html = `<div class="dd-head"><div class="dd-label" style="padding:0">Results</div>`
+           + `<div class="cnt"><b>${res.total}</b> match${res.total===1?"":"es"}</div></div>`;
+
+  if(!res.total){
+    html += `<div class="dd-empty">No matches for “${escapeHtml(q)}”.</div>`;
+    dd.innerHTML = html; dd.classList.add("open"); return;
+  }
+
+  if(res.companies.length){
+    html += `<div class="dd-sec"><div class="dd-label">Companies</div>`;
+    for(const b of res.companies){
+      const s=b.summary;
+      const bits=[];
+      if(s.doj) bits.push(`${s.doj} settlement${s.doj>1?"s":""}`);
+      if(s.letters) bits.push(`${s.letters} FDA letter${s.letters>1?"s":""}`);
+      if(s.lawsuits) bits.push(`${s.lawsuits} lawsuit${s.lawsuits>1?"s":""}`);
+      if(!bits.length) bits.push(`${s.total} record${s.total>1?"s":""}`);
+      const initials = b.display.replace(/[^A-Za-z ]/g,"").split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase() || "•";
+      html += `<div class="dd-item" data-nav="${idx}" data-kind="company" data-key="${encodeURIComponent(b.key)}">`
+            + `<div class="dd-ico company">${escapeHtml(initials)}</div>`
+            + `<div class="dd-main"><div class="dd-title">${hl(b.display)}</div>`
+            + `<div class="dd-meta">${escapeHtml(bits.join(" · "))}${s.dojTotal?` · <b style="color:var(--navy)">${fmtMoney(s.dojTotal)}</b>`:""}</div></div>`
+            + `<div class="dd-chev">›</div></div>`;
+      navItems.push({kind:"company", key:b.key}); idx++;
+    }
+    html += `</div>`;
+  }
+
+  if(res.records.length){
+    html += `<div class="dd-sec"><div class="dd-label">Records</div>`;
+    for(const r of res.records){
+      const meta = [r._year, r.Channel||r.CHANNEL||r["Legal Basis"]].filter(Boolean).join(" · ");
+      const snipField = firstMatchField(r, HLQ);
+      html += `<div class="dd-item" data-nav="${idx}" data-kind="record" data-id="${r._id}">`
+            + `<div class="dd-badge">${escapeHtml(sheetShort(r.source_sheet))}</div>`
+            + `<div class="dd-main"><div class="dd-title">${hl(r._title)}${meta?` <span style="color:var(--faint);font-weight:400">— ${escapeHtml(meta)}</span>`:""}</div>`
+            + `<div class="dd-meta" style="white-space:normal">${snipField}</div></div>`
+            + `<div class="dd-chev">›</div></div>`;
+      navItems.push({kind:"record", id:r._id}); idx++;
+    }
+    html += `</div>`;
+  }
+
+  if(res.glossary.length){
+    html += `<div class="dd-sec"><div class="dd-label">Glossary</div>`;
+    for(const g of res.glossary){
+      html += `<div class="gcard"><div><span class="gterm">${hl(g.Term||"")}</span>`
+            + (g.Category?`<span class="gcat">${escapeHtml(g.Category)}</span>`:"") + `</div>`
+            + `<div class="gdef">${hl(snippet(g.Definition||"", HLQ, 130))}</div>`
+            + (g["Where It Appears"]?`<div class="gwhere">Appears in: ${escapeHtml(g["Where It Appears"])}</div>`:"")
+            + `</div>`;
+    }
+    html += `</div>`;
+  }
+
+  dd.innerHTML = html;
+  dd.classList.add("open");
+  activeIndex = navItems.length ? 0 : -1;
+  paintActive();
+
+  dd.querySelectorAll(".dd-item").forEach(node=>{
+    node.addEventListener("click", ()=> activate(parseInt(node.dataset.nav,10)));
+    node.addEventListener("mousemove", ()=>{ activeIndex=parseInt(node.dataset.nav,10); paintActive(); });
+  });
+}
+
+function firstMatchField(rec, q){
+  const ql = q.toLowerCase();
+  for(const [k,v] of Object.entries(rec)){
+    if(k==="source_sheet"||k.startsWith("_")) continue;
+    const s=String(v);
+    if(s.toLowerCase().includes(ql)) return `<em style="font-style:normal;color:var(--faint)">${escapeHtml(k)}:</em> ${hl(snippet(s,q,70))}`;
+  }
+  const def = pick(rec, ["Summary","SUMMARY","Allegation Summary","Issue Summary","WHAT THEY SAID","Notes","NOTES"]);
+  return def ? hl(snippet(String(def), "", 70)) : "";
+}
+
+function sheetShort(s){
+  const map={"DOJ Settlements":"DOJ","OPDP Warning Letters":"Warning","OPDP Untitled Letters":"Untitled",
+    "Direct Quotes":"Quote","Pharma v Pharma Lawsuits":"Lawsuit","NAD Challenges":"NAD",
+    "TV Commercials":"TV","YouTube, Podcasts & Interviews":"YouTube","Online Video":"Video",
+    "Social Media":"Social","Banner & Display Ads":"Banner","Sales Aids & Print":"Print",
+    "Email":"Email","Conferences & In-Person":"Conf.","Investor & Press":"Investor"};
+  return map[s]||s;
+}
+
+function paintActive(){
+  const dd = el("dropdown");
+  dd.querySelectorAll(".dd-item").forEach(n=>{
+    const on = parseInt(n.dataset.nav,10)===activeIndex;
+    n.classList.toggle("active", on);
+    if(on) n.scrollIntoView({block:"nearest"});
+  });
+}
+function activate(i){
+  const it = navItems[i]; if(!it) return;
+  closeDropdown();
+  if(it.kind==="company") location.hash = "#/company/" + encodeURIComponent(it.key);
+  else location.hash = "#/record/" + it.id;
+}
+function closeDropdown(){ const dd=el("dropdown"); dd.classList.remove("open"); dd.innerHTML=""; navItems=[]; activeIndex=-1; }
+
+/* =========================================================================
+   Views
+   ========================================================================= */
+function setRoute(cls){ document.body.classList.toggle("route-landing", cls==="landing"); }
+
+function renderLanding(){
+  setRoute("landing");
+  el("app").innerHTML =
+    `<div class="tiles">
+      <div class="tile"><div class="v">${STATS.records}</div><div class="l">Records tracked</div></div>
+      <div class="tile"><div class="v">${STATS.companies}</div><div class="l">Companies</div></div>
+      <div class="tile"><div class="v">${fmtMoney(STATS.dojTotal)}</div><div class="l">DOJ settlements</div></div>
+      <div class="tile"><div class="v">${STATS.glossary}</div><div class="l">Glossary terms</div></div>
+    </div>
+    <div class="hint">Start typing above · <span class="kbd">↑</span><span class="kbd">↓</span> to navigate · <span class="kbd">↵</span> to open · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus search</div>`;
+}
+
+function rowHtml(rec, leftTop, leftTag, badge, title, snip){
+  const badgeHtml = badge ? `<span class="rbadge ${badge.cls}">${escapeHtml(badge.txt)}</span>` : "";
+  return `<div class="row" data-id="${rec._id}">
+      <div class="rl"><div class="rdate">${escapeHtml(leftTop||"—")}</div>`
+      + (leftTag?`<div class="rtag">${escapeHtml(leftTag)}</div>`:"") + badgeHtml + `</div>
+      <div class="rm"><div class="rtitle">${title}</div>`
+      + (snip?`<div class="rsnip">${snip}</div>`:"") + `</div>
+      <div class="rchev">›</div></div>`;
+}
+
+function renderCompany(key){
+  setRoute("view");
+  const b = COMPANIES.get(key);
+  if(!b){ el("app").innerHTML = backBar() + `<div class="empty-view">Company not found.</div>`; return; }
+  const s = b.summary;
+
+  // group records by category
+  const g = {doj:[], letter:[], quote:[], lawsuit:[], nad:[], channel:[]};
+  for(const item of b.records){ const c=catOf(item.rec.source_sheet); if(g[c]) g[c].push(item); }
+
+  // stat chips
+  const stat = [];
+  if(s.dojTotal) stat.push([fmtMoney(s.dojTotal), "Settlements"]);
+  if(s.doj) stat.push([s.doj, "DOJ actions"]);
+  if(s.letters) stat.push([s.letters, "FDA letters"]);
+  if(s.quotes) stat.push([s.quotes, "Direct quotes"]);
+  if(s.lawsuits) stat.push([s.lawsuits, "Lawsuits"]);
+  if(s.nad) stat.push([s.nad, "NAD challenges"]);
+  if(s.channels) stat.push([s.channels, "Channel ads"]);
+
+  let html = backBar();
+  html += `<div class="profile-head">
+      <h1>${escapeHtml(b.display)}</h1>`
+    + (b.variants.length ? `<div class="variants">Also recorded as: <b>${b.variants.map(escapeHtml).join("</b>, <b>")}</b></div>`:"")
+    + `<div class="pstats">`
+    + stat.map(([v,l])=>`<div class="pstat"><div class="v">${escapeHtml(String(v))}</div><div class="l">${escapeHtml(l)}</div></div>`).join("")
+    + `</div></div>`;
+
+  // timeline + top violations
+  html += `<div class="grid2">`
+       + `<div class="panel"><h2>Enforcement timeline</h2>${timelineHtml(b)}</div>`
+       + `<div class="panel"><h2>Top violation types</h2>${violationsHtml(b)}</div>`
+       + `</div>`;
+
+  // sections
+  if(g.doj.length){
+    html += sectionOpen("DOJ Settlements", s.dojTotal?`${fmtMoneyFull(s.dojTotal)} total`:"");
+    for(const {rec} of g.doj.sort(byDateDesc)){
+      const amt = typeof rec["Total Amount"]==="number" ? fmtMoney(rec["Total Amount"]) : (rec["Total Amount"]||"");
+      html += rowHtml(rec, fmtDate(rec["Settlement Date"])||rec._year, amt, null,
+        hl(rec["Violation Category"]||"Settlement"),
+        hl(snippet(rec.Summary||rec.Notes||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  if(g.letter.length){
+    html += sectionOpen("FDA Enforcement Letters", `${g.letter.length}`);
+    for(const {rec} of g.letter.sort(byDateDesc)){
+      const warn = rec.source_sheet==="OPDP Warning Letters";
+      html += rowHtml(rec, fmtDate(recDate(rec))||rec._year, rec.CHANNEL||rec.Channel,
+        {cls: warn?"warn":"untitled", txt: warn?"Warning":"Untitled"},
+        hl(pick(rec,VTYPE_KEYS)||"Enforcement letter"),
+        hl(snippet(rec.SUMMARY||rec.Summary||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  if(g.quote.length){
+    html += sectionOpen("Direct Quotes", `${g.quote.length}`);
+    for(const {rec} of g.quote.sort(byDateDesc)){
+      html += rowHtml(rec, fmtDate(recDate(rec))||rec._year, [rec.PRODUCT,rec.CHANNEL].filter(Boolean).join(" · "), null,
+        hl(pick(rec,VTYPE_KEYS)||"Direct quote"),
+        hl(snippet(rec["WHAT THEY SAID"]||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  if(g.lawsuit.length){
+    html += sectionOpen("Litigation", `${g.lawsuit.length}`);
+    for(const {rec, role} of g.lawsuit.sort(byYearDesc)){
+      const opp = role==="plaintiff" ? rec.Defendant : rec.Plaintiff;
+      const roleTxt = role==="plaintiff" ? "As plaintiff" : role==="defendant" ? "As defendant" : "Party";
+      html += rowHtml(rec, rec.Year||rec._year, roleTxt, null,
+        `vs. ${hl(opp||"—")}`,
+        hl(snippet(rec["Allegation Summary"]||rec.Outcome||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  if(g.nad.length){
+    html += sectionOpen("NAD Challenges", `${g.nad.length}`);
+    for(const {rec, role} of g.nad.sort(byYearDesc)){
+      const opp = role==="challenger" ? rec.Advertiser : rec.Challenger;
+      const roleTxt = role==="challenger" ? "As challenger" : "As advertiser";
+      html += rowHtml(rec, rec.Year||rec._year, roleTxt, null,
+        `vs. ${escapeHtml(opp||"—")}`,
+        hl(snippet(rec["Issue Summary"]||rec.Outcome||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  if(g.channel.length){
+    html += sectionOpen("Channel Appearances", `${g.channel.length}`);
+    for(const {rec} of g.channel.sort(byDateDesc)){
+      html += rowHtml(rec, fmtDate(recDate(rec))||rec._year, sheetShort(rec.source_sheet), null,
+        hl(pick(rec,VTYPE_KEYS)||rec.Channel||"Promotion"),
+        hl(snippet(rec.Summary||"", HLQ)));
+    }
+    html += `</div>`;
+  }
+
+  el("app").innerHTML = html;
+  wireBack();
+  el("app").querySelectorAll(".row").forEach(r=>{
+    r.addEventListener("click", ()=> location.hash = "#/record/" + r.dataset.id);
+  });
+}
+
+function sectionOpen(title, sum){
+  return `<div class="section"><h2>${escapeHtml(title)}${sum?`<span class="sum">${sum}</span>`:""}</h2>`;
+}
+function byDateDesc(a,b){ return (dnum(b.rec)) - (dnum(a.rec)); }
+function byYearDesc(a,b){ return (parseInt(a.rec._year)||0) < (parseInt(b.rec._year)||0) ? 1 : -1; }
+function dnum(rec){
+  const d = recDate(rec);
+  if(d){ const t=Date.parse(d); if(!isNaN(t)) return t; }
+  const y=parseInt(rec._year); return isNaN(y)?0:Date.parse(y+"-01-01");
+}
+function fmtDate(v){
+  if(!v) return null;
+  const t=Date.parse(v);
+  if(isNaN(t)) return String(v);
+  const d=new Date(t);
+  return d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
+}
+
+function timelineHtml(b){
+  const counts = new Map();
+  for(const {rec} of b.records){ const y=rec._year; if(y) counts.set(y,(counts.get(y)||0)+1); }
+  if(!counts.size) return `<div style="color:var(--muted);font-size:13px">No dated records.</div>`;
+  const years=[...counts.keys()].map(Number).sort((a,b)=>a-b);
+  const max=Math.max(...counts.values());
+  let out=`<div class="timeline">`;
+  for(const y of years){
+    const c=counts.get(String(y));
+    const h=Math.round(14 + (c/max)*70);
+    out += `<div class="tl-col"><div class="tl-bar" style="height:${h}px"><span>${c}</span></div><div class="tl-yr">${y}</div></div>`;
+  }
+  return out + `</div>`;
+}
+
+function violationsHtml(b){
+  const counts=new Map();
+  for(const {rec} of b.records){
+    const v=pick(rec, VTYPE_KEYS);
+    if(v) counts.set(v,(counts.get(v)||0)+1);
+  }
+  if(!counts.size) return `<div style="color:var(--muted);font-size:13px">No violation types recorded.</div>`;
+  const top=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const max=top[0][1];
+  return top.map(([name,c])=>
+    `<div class="vbar"><div class="vl"><span class="vn">${escapeHtml(name)}</span><span class="vc">${c}</span></div>`
+    + `<div class="track"><div class="fill" style="width:${Math.round(c/max*100)}%"></div></div></div>`).join("");
+}
+
+function backBar(){
+  return `<div class="backbar"><button class="btn-back" id="backbtn">‹ Back to search</button></div>`;
+}
+function wireBack(){ const b=el("backbtn"); if(b) b.addEventListener("click", ()=> location.hash="#/"); }
+
+/* ---- record slide-over ---- */
+function openRecord(id){
+  const rec = RECORDS[id];
+  const panel = el("panel"), backdrop = el("backdrop");
+  if(!rec){ closeRecord(); return; }
+
+  let fields="";
+  let cta="";
+  for(const [k,v] of Object.entries(rec)){
+    if(k==="source_sheet"||k.startsWith("_")) continue;
+    const val = String(v);
+    const rendered = linkify(hl(val));
+    if(/^https?:\/\//.test(val) && !cta){
+      cta = `<div class="panel-cta"><a href="${escapeHtml(val)}" target="_blank" rel="noopener">Open source ↗</a></div>`;
+    }
+    fields += `<div class="field"><div class="k">${escapeHtml(k)}</div><div class="v">${rendered}</div></div>`;
+  }
+
+  panel.innerHTML =
+    `<div class="panel-top">
+       <div><div class="pt-badge">${escapeHtml(rec.source_sheet)}</div><h2>${hl(rec._title)}</h2></div>
+       <button class="panel-close" id="panel-close" aria-label="Close">✕</button>
+     </div>
+     <div class="panel-body">${fields}${cta}</div>`;
+  panel.classList.add("open"); panel.setAttribute("aria-hidden","false");
+  backdrop.classList.add("open");
+  el("panel-close").addEventListener("click", closeRecordNav);
+}
+function closeRecord(){
+  el("panel").classList.remove("open"); el("panel").setAttribute("aria-hidden","true");
+  el("backdrop").classList.remove("open");
+}
+function closeRecordNav(){ location.hash = currentBaseHash || "#/"; }
+
+/* =========================================================================
+   Router
+   ========================================================================= */
+function router(){
+  const hash = location.hash || "#/";
+  const mRec = hash.match(/^#\/record\/(\d+)$/);
+  if(mRec){
+    // keep whatever base view is showing; ensure one exists
+    if(!currentBaseHash || currentBaseHash==="#/record"){ currentBaseHash="#/"; renderLanding(); }
+    else ensureBase(currentBaseHash);
+    openRecord(parseInt(mRec[1],10));
+    return;
+  }
+  closeRecord();
+  currentBaseHash = hash;
+  ensureBase(hash);
+  window.scrollTo(0,0);
+}
+let lastRenderedBase = null;
+function ensureBase(hash){
+  if(lastRenderedBase===hash) return;
+  lastRenderedBase = hash;
+  const mComp = hash.match(/^#\/company\/(.+)$/);
+  if(mComp){ renderCompany(decodeURIComponent(mComp[1])); }
+  else { renderLanding(); }
+}
+
+/* =========================================================================
+   Boot
+   ========================================================================= */
+function wireSearch(){
+  const q = el("q");
+  q.addEventListener("input", ()=>{ clearTimeout(debounceT); debounceT=setTimeout(renderDropdown,120); });
+  q.addEventListener("focus", ()=>{ if(q.value.trim()) renderDropdown(); });
+  q.addEventListener("keydown", e=>{
+    const dd=el("dropdown");
+    if(e.key==="ArrowDown"){ e.preventDefault(); if(navItems.length){ activeIndex=Math.min(navItems.length-1,activeIndex+1); paintActive(); } }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); if(navItems.length){ activeIndex=Math.max(0,activeIndex-1); paintActive(); } }
+    else if(e.key==="Enter"){ if(activeIndex>=0){ e.preventDefault(); activate(activeIndex); } }
+    else if(e.key==="Escape"){ if(dd.classList.contains("open")){ closeDropdown(); } else { q.blur(); } }
+  });
+  // click outside closes dropdown
+  document.addEventListener("click", e=>{
+    if(!el("dropdown").contains(e.target) && e.target!==q && !el("dropdown").parentElement.contains(e.target))
+      closeDropdown();
+  });
+  // global shortcuts
+  document.addEventListener("keydown", e=>{
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); q.focus(); q.select(); }
+    else if(e.key==="/" && document.activeElement!==q && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
+      e.preventDefault(); q.focus();
+    }
+    else if(e.key==="Escape" && el("panel").classList.contains("open")){ closeRecordNav(); }
+  });
+  el("brand").addEventListener("click", ()=> location.hash="#/");
+  el("backdrop").addEventListener("click", closeRecordNav);
+}
+
+fetch("data.json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+.then(data=>{
+  RECORDS = data.records||[];
+  GLOSSARY = data.glossary||[];
+  buildIndex();
+  wireSearch();
+  window.addEventListener("hashchange", router);
+  router();
+})
+.catch(err=>{
+  el("app").innerHTML = `<div class="empty-view">Could not load <code>data.json</code> — ${escapeHtml(err.message)}.<br>Serve this folder over HTTP (e.g. <code>python3 -m http.server</code>), not via file://.</div>`;
+});
 </script>
 </body>
 </html>
