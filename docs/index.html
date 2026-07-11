@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Merz Legal Crystal Ball — Compliance Intelligence</title>
+<title>Merz Legal Crystal Ball · Compliance Intelligence</title>
 <style>
   :root{
     --navy:#1F3864;
@@ -39,6 +39,16 @@
     box-shadow:0 1px 0 rgba(255,255,255,.04), 0 6px 20px rgba(21,39,71,.18);
     transition:padding .25s ease;
   }
+  header::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;
+    background:
+      radial-gradient(58% 70% at 50% -8%, rgba(96,136,214,.42), transparent 62%),
+      radial-gradient(42% 55% at 88% -6%, rgba(70,100,175,.30), transparent 70%),
+      radial-gradient(40% 55% at 8% 0%, rgba(60,90,160,.22), transparent 72%);}
+  header::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;
+    background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1.4px);background-size:24px 24px;
+    -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%);}
+  body.route-landing header::before,body.route-landing header::after{opacity:1}
+  header > .hwrap,header > .topnav{position:relative;z-index:1}
   .hwrap{max-width:1000px;margin:0 auto;padding:0 22px}
   .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;padding-top:14px}
   .brand .logo{
@@ -52,9 +62,14 @@
   @media(max-width:560px){.brand .sub{display:none}}
 
   /* hero (landing) vs slim */
-  .hero{text-align:center;padding:34px 22px 30px;transition:all .25s ease}
-  .hero h1{margin:0 0 6px;font-size:30px;font-weight:720;letter-spacing:-.4px}
-  .hero p{margin:0 auto 22px;font-size:14.5px;color:#c3d0ea;max-width:560px}
+  .hero{text-align:center;padding:46px 22px 26px;transition:all .25s ease}
+  .hero .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
+    color:#a8bce2;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+    padding:5px 14px;border-radius:999px;margin-bottom:18px}
+  .hero h1{margin:0 0 12px;font-size:42px;font-weight:770;letter-spacing:-1.2px;line-height:1.03;
+    background:linear-gradient(180deg,#ffffff 0%,#c9d7f2 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin:0 auto 24px;font-size:15.5px;color:#b7c5e3;max-width:600px;line-height:1.55}
+  @media(max-width:560px){.hero h1{font-size:30px}.hero{padding:34px 18px 22px}}
   body:not(.route-landing) .hero{display:none}
   body.route-landing .brand{display:none}
 
@@ -115,14 +130,35 @@
 
   /* ---------- Body / views ---------- */
   main{max-width:1000px;margin:0 auto;padding:26px 22px 80px}
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px auto 0;max-width:760px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px auto 0;max-width:none}
   @media(max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
-  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 16px;
-    box-shadow:var(--shadow);text-align:center}
-  .tile .v{font-size:24px;font-weight:750;color:var(--navy);letter-spacing:-.5px;line-height:1.1}
-  .tile .l{font-size:11.5px;color:var(--muted);margin-top:5px;letter-spacing:.2px}
-  .hint{text-align:center;color:var(--faint);font-size:12.5px;margin-top:28px}
+  .tile{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px 16px;
+    box-shadow:var(--shadow);text-align:center;overflow:hidden;transition:transform .15s,box-shadow .15s,border-color .15s}
+  .tile::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4661a0,#1F3864)}
+  .tile:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(31,56,100,.1);border-color:#cfdaee}
+  .tile .v{font-size:27px;font-weight:770;color:var(--navy);letter-spacing:-.6px;line-height:1.1}
+  .tile .l{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+  .hint{text-align:center;color:var(--faint);font-size:12.5px;margin-top:22px}
   .hint .kbd{margin:0 2px}
+
+  /* front-page feature cards */
+  .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--faint);
+    font-weight:700;margin:36px 2px 0}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px}
+  @media(max-width:700px){.features{grid-template-columns:1fr}}
+  .fcard{position:relative;display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px;text-decoration:none;color:inherit;box-shadow:var(--shadow);overflow:hidden;
+    transition:transform .16s,box-shadow .16s,border-color .16s}
+  .fcard::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(135deg,rgba(31,56,100,.035),transparent 46%)}
+  .fcard:hover{transform:translateY(-3px);border-color:#bccae4;box-shadow:0 14px 34px rgba(31,56,100,.14)}
+  .fcard .fico{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;
+    background:linear-gradient(135deg,#e9f0fc,#d9e5fb);box-shadow:inset 0 0 0 1px rgba(31,56,100,.06);margin-bottom:15px}
+  .fcard h3{margin:0 0 6px;font-size:16.5px;font-weight:720;color:var(--navy-ink);letter-spacing:-.2px}
+  .fcard p{margin:0;font-size:13px;color:var(--muted);line-height:1.55;max-width:94%}
+  .fcard .farrow{position:absolute;top:22px;right:22px;color:var(--faint);font-size:20px;line-height:1;
+    transition:transform .16s,color .16s}
+  .fcard:hover .farrow{transform:translateX(4px);color:var(--navy)}
 
   /* back bar */
   .backbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
@@ -213,6 +249,79 @@
     color:var(--ink);border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;
     box-shadow:var(--shadow);cursor:pointer;max-width:220px}
 
+  /* ---------- Top nav ---------- */
+  .topnav .hwrap{display:flex;gap:3px;padding-top:8px;padding-bottom:6px}
+  body.route-landing .topnav .hwrap{justify-content:center}
+  .topnav a{color:#b3c1de;text-decoration:none;font-size:13px;font-weight:600;padding:6px 13px;border-radius:8px;transition:all .12s}
+  .topnav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .topnav a.on{color:#fff;background:rgba(255,255,255,.15)}
+
+  [data-href],[data-company]{cursor:pointer}
+
+  /* ---------- Action buttons ---------- */
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .btn-act{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);
+    color:var(--navy);font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;
+    box-shadow:var(--shadow);transition:border-color .12s}
+  .btn-act:hover{border-color:#bccae4}
+
+  /* ---------- Dashboard ---------- */
+  .dash-head{margin-bottom:18px}
+  .dash-head h1{margin:0;font-size:23px;font-weight:730;letter-spacing:-.3px;color:var(--navy-ink)}
+  .dash-head .rsub{font-size:13px;color:var(--muted);margin-top:5px}
+  .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.dash-grid{grid-template-columns:1fr}}
+  .panel.wide{grid-column:1/-1}
+  .ychart{display:flex;align-items:flex-end;gap:5px;min-height:150px;overflow-x:auto;padding:6px 0 2px}
+  .yc{flex:1 0 auto;min-width:22px;display:flex;flex-direction:column;align-items:center;gap:4px;
+    text-decoration:none;justify-content:flex-end}
+  .yc-bar{width:70%;max-width:24px;background:linear-gradient(180deg,#4661a0,#1F3864);border-radius:4px 4px 2px 2px;
+    min-height:3px;transition:height .3s ease}
+  .yc:hover .yc-bar{filter:brightness(1.15)}
+  .yc-v{font-size:9.5px;color:var(--muted);font-weight:700}
+  .yc-y{font-size:10px;color:var(--faint)}
+  .hb{display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:baseline;margin:9px 0;text-decoration:none}
+  .hb .hb-l{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hb .hb-v{font-size:12px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+  .hb .hb-track{grid-column:1/-1;height:8px;background:var(--line-2);border-radius:5px;overflow:hidden}
+  .hb .hb-fill{height:100%;background:linear-gradient(90deg,#4661a0,#1F3864);border-radius:5px}
+  a.hb:hover .hb-l{color:var(--navy)}
+
+  /* ---------- Browse ---------- */
+  .browse-sec{margin-bottom:24px}
+  .browse-sec > h2{margin:0 0 11px;font-size:13px;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--muted);font-weight:700}
+  .bchips{display:flex;flex-wrap:wrap;gap:8px}
+  .bchip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:999px;padding:6px 13px;font-size:13px;color:var(--ink);text-decoration:none;box-shadow:var(--shadow)}
+  .bchip:hover{border-color:#bccae4;color:var(--navy)}
+  .bchip .bn{font-size:11px;font-weight:700;color:var(--faint)}
+  .company-index{display:flex;flex-wrap:wrap;gap:6px 16px;line-height:1.7}
+  .company-index a{font-size:13px;color:var(--navy);text-decoration:none}
+  .company-index a:hover{text-decoration:underline}
+
+  /* ---------- Direct-quotes spotlight ---------- */
+  .qcard{background:#fff;border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:12px;
+    padding:15px 18px;margin:12px 0;box-shadow:var(--shadow);cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .qcard:hover{border-left-color:var(--gold);box-shadow:0 2px 10px rgba(31,56,100,.08)}
+  .qcard .qsaid{font-size:15px;color:var(--navy-ink);font-weight:600;line-height:1.5}
+  .qcard .qsaid::before{content:"“";color:var(--gold);font-size:20px;font-weight:800;margin-right:1px}
+  .qcard .qwhy{font-size:12.5px;color:var(--muted);margin-top:9px}
+  .qcard .qwhy b{color:var(--ink)}
+  .qcard .qmeta{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .qtag{font-size:11px;font-weight:600;background:var(--chip);color:var(--navy);border-radius:6px;padding:2px 9px}
+  .q-filter input{font-family:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--ink);box-shadow:var(--shadow);min-width:240px}
+
+  /* ---------- Cross-linking ---------- */
+  .rel{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .rel a{font-size:12px;font-weight:600;border-radius:7px;padding:4px 10px;text-decoration:none}
+  .rel a.rel-co{background:#e6eefb;color:var(--navy)}
+  .rel a.rel-co:hover{background:#d8e4fa}
+  .rel a.rel-v{background:var(--chip);color:var(--ink)}
+  .rel a.rel-v:hover{background:#e2e8f2}
+  .gloss{border-bottom:1px dashed var(--gold);cursor:help}
+
   /* ---------- Record slide-over ---------- */
   #backdrop{position:fixed;inset:0;background:rgba(16,26,48,.42);backdrop-filter:blur(2px);z-index:60;
     opacity:0;pointer-events:none;transition:opacity .2s}
@@ -240,6 +349,16 @@
 
   mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
   .loading{text-align:center;color:var(--muted);padding:60px 0}
+
+  /* ---------- Print (company profile → PDF) ---------- */
+  @media print{
+    header,#dropdown,#backdrop,#panel,.topnav,.backbar,.controls,.actions,.hint,.btn-back,.btn-act{display:none!important}
+    body{background:#fff}
+    main{padding:0;max-width:none}
+    .section,.panel,.profile-head,.tile{box-shadow:none;border-color:#cfd6e0;break-inside:avoid}
+    .grid2,.dash-grid{gap:12px}
+    a{color:#111;text-decoration:none}
+  }
 </style>
 </head>
 <body class="route-landing">
@@ -253,8 +372,9 @@
       </div>
     </div>
     <div class="hero">
+      <span class="eyebrow">Pharma Advertising Compliance Intelligence</span>
       <h1>Merz Legal Crystal Ball</h1>
-      <p>Search pharmaceutical advertising enforcement — settlements, FDA letters, lawsuits, and promotional claims — by company, record, or term.</p>
+      <p>Every DOJ settlement, FDA warning letter, competitor lawsuit, and flagged promotional claim, searchable in one place.</p>
     </div>
     <div class="search-shell">
       <div class="search-box">
@@ -266,6 +386,14 @@
       <div id="dropdown" role="listbox"></div>
     </div>
   </div>
+  <nav class="topnav" id="topnav">
+    <div class="hwrap">
+      <a href="#/" data-nav="home">Search</a>
+      <a href="#/dashboard" data-nav="dashboard">Dashboard</a>
+      <a href="#/browse" data-nav="browse">Browse</a>
+      <a href="#/quotes" data-nav="quotes">Quotes</a>
+    </div>
+  </nav>
 </header>
 
 <main id="app"><div class="loading">Loading compliance data…</div></main>
@@ -457,7 +585,7 @@ function snippet(text, q, radius){
    Fuzzy matching
    ========================================================================= */
 // returns a score (higher better) or null.
-// fuzzy=true adds subsequence (typo-tolerant) matching — only sensible for short
+// fuzzy=true adds subsequence (typo-tolerant) matching, only sensible for short
 // strings like titles/company/glossary terms, not the full record haystack.
 function matchScore(text, q, fuzzy){
   text = text.toLowerCase();
@@ -544,7 +672,7 @@ function renderDropdown(){
     dd.innerHTML = html; dd.classList.add("open"); navItems=[]; activeIndex=-1; return;
   }
 
-  // "See all" row — default highlighted; Enter opens the full results page.
+  // "See all" row, default highlighted; Enter opens the full results page.
   html += `<div class="dd-sec"><div class="dd-item dd-seeall" data-nav="${idx}" data-kind="search">`
         + `<div class="dd-ico" aria-hidden="true">⌕</div>`
         + `<div class="dd-main"><div class="dd-title">See all results for “${escapeHtml(q.trim())}”</div>`
@@ -579,7 +707,7 @@ function renderDropdown(){
       const snipField = firstMatchField(r, HLQ);
       html += `<div class="dd-item" data-nav="${idx}" data-kind="record" data-id="${r._id}">`
             + `<div class="dd-badge">${escapeHtml(sheetShort(r.source_sheet))}</div>`
-            + `<div class="dd-main"><div class="dd-title">${hl(r._title)}${meta?` <span style="color:var(--faint);font-weight:400">— ${escapeHtml(meta)}</span>`:""}</div>`
+            + `<div class="dd-main"><div class="dd-title">${hl(r._title)}${meta?` <span style="color:var(--faint);font-weight:400">· ${escapeHtml(meta)}</span>`:""}</div>`
             + `<div class="dd-meta" style="white-space:normal">${snipField}</div></div>`
             + `<div class="dd-chev">›</div></div>`;
       navItems.push({kind:"record", id:r._id}); idx++;
@@ -657,8 +785,25 @@ function closeDropdown(){ const dd=el("dropdown"); dd.classList.remove("open"); 
    ========================================================================= */
 function setRoute(cls){ document.body.classList.toggle("route-landing", cls==="landing"); }
 
+function latestRecords(n){
+  return RECORDS.filter(r=>(catOf(r.source_sheet)==="doj"||catOf(r.source_sheet)==="letter") && dnum(r)>0)
+    .sort((a,b)=>dnum(b)-dnum(a)).slice(0,n);
+}
 function renderLanding(){
-  setRoute("landing");
+  setRoute("landing"); setNav("home"); HLQ="";
+  const latest = latestRecords(6);
+  const latestHtml = latest.map(r=>{
+    const warn = r.source_sheet==="OPDP Warning Letters";
+    const badge = r.source_sheet==="DOJ Settlements" ? "" :
+      `<span class="rbadge ${warn?"warn":"untitled"}">${warn?"Warning":"Untitled"}</span>`;
+    return `<div class="row" data-id="${r._id}">
+        <div class="rl"><div class="rdate">${escapeHtml(fmtDate(recDate(r))||r._year||"n/a")}</div>
+          <div class="rtag">${escapeHtml(sheetShort(r.source_sheet))}</div>${badge}</div>
+        <div class="rm"><div class="rtitle">${escapeHtml(r._title)}</div>
+          <div class="rsnip">${escapeHtml(snippet(pick(r,["Summary","SUMMARY","Violation Category"])||"", "", 90))}</div></div>
+        <div class="rchev">›</div></div>`;
+  }).join("");
+
   el("app").innerHTML =
     `<div class="tiles">
       <div class="tile"><div class="v">${STATS.records}</div><div class="l">Records tracked</div></div>
@@ -666,7 +811,44 @@ function renderLanding(){
       <div class="tile"><div class="v">${fmtMoney(STATS.dojTotal)}</div><div class="l">DOJ settlements</div></div>
       <div class="tile"><div class="v">${STATS.glossary}</div><div class="l">Glossary terms</div></div>
     </div>
-    <div class="hint">Start typing above · <span class="kbd">↵</span> for all results · <span class="kbd">↑</span><span class="kbd">↓</span> then <span class="kbd">↵</span> to jump to one · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus</div>`;
+    <div class="hint">Type above to search · <span class="kbd">↵</span> for all results · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus from anywhere</div>
+
+    <div class="section-label">Explore the dataset</div>
+    <div class="features">
+      <a class="fcard" data-href="#/dashboard">
+        <div class="fico">📊</div><h3>Analytics dashboard</h3>
+        <p>Trends by year, top violation types, most cited companies, and settlement dollars at a glance.</p>
+        <span class="farrow">›</span>
+      </a>
+      <a class="fcard" data-href="#/browse">
+        <div class="fico">🗂️</div><h3>Browse by category</h3>
+        <p>Filter records by violation type, year, channel, or company. No search query needed.</p>
+        <span class="farrow">›</span>
+      </a>
+      <a class="fcard" data-href="#/quotes">
+        <div class="fico">❝</div><h3>Direct quotes</h3>
+        <p>Verbatim promotional claims FDA cited, paired with why each one was flagged.</p>
+        <span class="farrow">›</span>
+      </a>
+    </div>
+
+    <div class="grid2" style="margin-top:26px">
+      <div class="section" style="margin:0">
+        <h2>Latest enforcement<span class="sum">newest first</span></h2>
+        ${latestHtml}
+      </div>
+      <div class="panel">
+        <h2>Common violation types</h2>
+        <div class="bchips">${topViolationChips(8)}</div>
+      </div>
+    </div>`;
+  wireCommon();
+}
+function topViolationChips(n){
+  const vio=new Map();
+  for(const r of RECORDS){ const v=pick(r,VTYPE_KEYS); if(v) vio.set(v,(vio.get(v)||0)+1); }
+  return [...vio.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n)
+    .map(([label,count])=>`<a class="bchip" data-href="#/browse/violation/${encodeURIComponent(label)}">${escapeHtml(label)}<span class="bn">${count}</span></a>`).join("");
 }
 
 /* ---- Full search results page ---- */
@@ -674,7 +856,7 @@ let searchState = {q:"", type:"all", sheet:"", sort:"relevance"};
 let searchRes = null;
 
 function renderSearchPage(q){
-  setRoute("view");
+  setRoute("view"); setNav("home");
   q = (q||"").trim();
   // reflect the query in the search box + highlighting
   el("q").value = q;
@@ -744,7 +926,9 @@ function renderSearchResults(){
          <option value="company" ${st.sort==="company"?"selected":""}>Company A–Z</option>
        </select></label>`;
   }
+  if(showR && c.records) controls += `<button class="btn-act" data-act="export">⤓ Export CSV</button>`;
   controls += `</div></div>`;
+  exportSet = {name:"search-"+searchState.q, records:recs};
 
   // ---- lists ----
   let body = controls;
@@ -786,6 +970,7 @@ function renderSearchResults(){
   });
   const fs=el("f-sheet"); if(fs) fs.addEventListener("change", ()=>{ searchState.sheet=fs.value; renderSearchResults(); });
   const so=el("f-sort"); if(so) so.addEventListener("change", ()=>{ searchState.sort=so.value; renderSearchResults(); });
+  el("search-body").querySelectorAll("[data-act]").forEach(n=> n.addEventListener("click", ()=>{ if(exportSet) downloadCSV(exportSet.records, exportSet.name); }));
   el("search-body").querySelectorAll(".row[data-id]").forEach(r=>{
     r.addEventListener("click", ()=> location.hash = "#/record/" + r.dataset.id);
   });
@@ -814,9 +999,9 @@ function companyRowHtml(b){
 function searchRecordRow(rec){
   const meta = [rec.Channel||rec.CHANNEL||rec["Legal Basis"]].filter(Boolean).join(" · ");
   return `<div class="row" data-id="${rec._id}">
-      <div class="rl"><div class="rdate">${escapeHtml(fmtDate(recDate(rec))||rec._year||"—")}</div>
+      <div class="rl"><div class="rdate">${escapeHtml(fmtDate(recDate(rec))||rec._year||"n/a")}</div>
         <div class="rtag">${escapeHtml(sheetShort(rec.source_sheet))}</div></div>
-      <div class="rm"><div class="rtitle">${hl(rec._title)}${meta?` <span style="color:var(--faint);font-weight:400">— ${escapeHtml(meta)}</span>`:""}</div>
+      <div class="rm"><div class="rtitle">${hl(rec._title)}${meta?` <span style="color:var(--faint);font-weight:400">· ${escapeHtml(meta)}</span>`:""}</div>
         <div class="rsnip">${firstMatchField(rec, HLQ)}</div></div>
       <div class="rchev">›</div></div>`;
 }
@@ -824,7 +1009,7 @@ function searchRecordRow(rec){
 function rowHtml(rec, leftTop, leftTag, badge, title, snip){
   const badgeHtml = badge ? `<span class="rbadge ${badge.cls}">${escapeHtml(badge.txt)}</span>` : "";
   return `<div class="row" data-id="${rec._id}">
-      <div class="rl"><div class="rdate">${escapeHtml(leftTop||"—")}</div>`
+      <div class="rl"><div class="rdate">${escapeHtml(leftTop||"n/a")}</div>`
       + (leftTag?`<div class="rtag">${escapeHtml(leftTag)}</div>`:"") + badgeHtml + `</div>
       <div class="rm"><div class="rtitle">${title}</div>`
       + (snip?`<div class="rsnip">${snip}</div>`:"") + `</div>
@@ -832,10 +1017,11 @@ function rowHtml(rec, leftTop, leftTag, badge, title, snip){
 }
 
 function renderCompany(key){
-  setRoute("view");
+  setRoute("view"); setNav(null);
   const b = COMPANIES.get(key);
-  if(!b){ el("app").innerHTML = backBar() + `<div class="empty-view">Company not found.</div>`; return; }
+  if(!b){ el("app").innerHTML = backBar() + `<div class="empty-view">Company not found.</div>`; wireBack(); return; }
   const s = b.summary;
+  exportSet = {name:"company-"+b.display, records:b.records.map(x=>x.rec)};
 
   // group records by category
   const g = {doj:[], letter:[], quote:[], lawsuit:[], nad:[], channel:[]};
@@ -851,7 +1037,12 @@ function renderCompany(key){
   if(s.nad) stat.push([s.nad, "NAD challenges"]);
   if(s.channels) stat.push([s.channels, "Channel ads"]);
 
-  let html = backBar();
+  let html = `<div class="backbar"><button class="btn-back" id="backbtn">‹ Back to search</button>`
+    + `<div class="actions">
+         <button class="btn-act" data-act="export">⤓ Export CSV</button>
+         <button class="btn-act" data-act="copy">🔗 Copy link</button>
+         <button class="btn-act" data-act="print">🖨 Print / PDF</button>
+       </div></div>`;
   html += `<div class="profile-head">
       <h1>${escapeHtml(b.display)}</h1>`
     + (b.variants.length ? `<div class="variants">Also recorded as: <b>${b.variants.map(escapeHtml).join("</b>, <b>")}</b></div>`:"")
@@ -905,7 +1096,7 @@ function renderCompany(key){
       const opp = role==="plaintiff" ? rec.Defendant : rec.Plaintiff;
       const roleTxt = role==="plaintiff" ? "As plaintiff" : role==="defendant" ? "As defendant" : "Party";
       html += rowHtml(rec, rec.Year||rec._year, roleTxt, null,
-        `vs. ${hl(opp||"—")}`,
+        `vs. ${hl(opp||"n/a")}`,
         hl(snippet(rec["Allegation Summary"]||rec.Outcome||"", HLQ)));
     }
     html += `</div>`;
@@ -917,7 +1108,7 @@ function renderCompany(key){
       const opp = role==="challenger" ? rec.Advertiser : rec.Challenger;
       const roleTxt = role==="challenger" ? "As challenger" : "As advertiser";
       html += rowHtml(rec, rec.Year||rec._year, roleTxt, null,
-        `vs. ${escapeHtml(opp||"—")}`,
+        `vs. ${escapeHtml(opp||"n/a")}`,
         hl(snippet(rec["Issue Summary"]||rec.Outcome||"", HLQ)));
     }
     html += `</div>`;
@@ -935,9 +1126,7 @@ function renderCompany(key){
 
   el("app").innerHTML = html;
   wireBack();
-  el("app").querySelectorAll(".row").forEach(r=>{
-    r.addEventListener("click", ()=> location.hash = "#/record/" + r.dataset.id);
-  });
+  wireCommon();
 }
 
 function sectionOpen(title, sum){
@@ -992,6 +1181,312 @@ function backBar(){
 }
 function wireBack(){ const b=el("backbtn"); if(b) b.addEventListener("click", ()=> location.hash="#/"); }
 
+/* =========================================================================
+   Shared: nav state, generic wiring, CSV / share
+   ========================================================================= */
+let exportSet = null;   // {name, records} for the visible listing's CSV export
+
+function setNav(name){
+  document.querySelectorAll("#topnav a").forEach(a=> a.classList.toggle("on", a.dataset.nav===name));
+}
+
+// Central click wiring for a rendered scope: record rows, company targets, hash links, actions.
+function wireCommon(scope){
+  scope = scope || el("app");
+  scope.querySelectorAll("[data-id]").forEach(n=> n.addEventListener("click", e=>{
+    if(e.target.closest("a,[data-href],[data-company]")) return;
+    location.hash = "#/record/" + n.dataset.id;
+  }));
+  scope.querySelectorAll("[data-company]").forEach(n=> n.addEventListener("click", e=>{
+    if(e.target.closest("[data-href]")) return;
+    location.hash = "#/company/" + encodeURIComponent(n.dataset.company);
+  }));
+  scope.querySelectorAll("[data-href]").forEach(n=> n.addEventListener("click", ()=>{ location.hash = n.dataset.href; }));
+  scope.querySelectorAll("[data-act]").forEach(n=> n.addEventListener("click", ()=>{
+    const a = n.dataset.act;
+    if(a==="export"){ if(exportSet) downloadCSV(exportSet.records, exportSet.name); }
+    else if(a==="copy") copyLink(n);
+    else if(a==="print") window.print();
+  }));
+}
+
+function csvEsc(v){ v = v==null ? "" : String(v); return /[",\n\r]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+function downloadCSV(records, name){
+  if(!records || !records.length) return;
+  const cols=[], seen=new Set();
+  records.forEach(r=> Object.keys(r).forEach(k=>{
+    if(k!=="source_sheet" && !k.startsWith("_") && !seen.has(k)){ seen.add(k); cols.push(k); }
+  }));
+  const header=["source_sheet", ...cols];
+  const lines=[header.map(csvEsc).join(",")];
+  for(const r of records) lines.push(header.map(h=>csvEsc(r[h])).join(","));
+  const blob=new Blob(["﻿"+lines.join("\r\n")], {type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=(name||"records").replace(/[^\w.-]+/g,"-").replace(/^-+|-+$/g,"") + ".csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+}
+function copyLink(btn){
+  const url=location.href;
+  const done=()=>{ const t=btn.textContent; btn.textContent="✓ Copied"; setTimeout(()=>{btn.textContent=t;},1400); };
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(url).then(done).catch(()=>fallbackCopy(url,done));
+  else fallbackCopy(url,done);
+}
+function fallbackCopy(text, done){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta); done && done();
+}
+
+/* =========================================================================
+   Analytics dashboard
+   ========================================================================= */
+function hbars(entries){
+  if(!entries.length) return `<div style="color:var(--muted);font-size:13px">No data.</div>`;
+  const max=Math.max(...entries.map(e=>e[1]));
+  return entries.map(([label,val,href])=>{
+    const inner = `<div class="hb-l">${escapeHtml(String(label))}</div>`
+      + `<div class="hb-v">${escapeHtml(String(val))}</div>`
+      + `<div class="hb-track"><div class="hb-fill" style="width:${max?Math.round(val/max*100):0}%"></div></div>`;
+    return href ? `<a class="hb" data-href="${href}">${inner}</a>` : `<div class="hb">${inner}</div>`;
+  }).join("");
+}
+function ychart(years, valOf, labelOf, titleOf){
+  const vals=years.map(valOf);
+  const max=Math.max(1, ...vals);
+  return `<div class="ychart">` + years.map((y,i)=>{
+    const v=vals[i]; const h=Math.round(6 + (v/max)*126);
+    return `<a class="yc" data-href="#/browse/year/${encodeURIComponent(y)}" title="${escapeHtml(titleOf(y,v))}">`
+      + `<div class="yc-v">${escapeHtml(labelOf(v))}</div>`
+      + `<div class="yc-bar" style="height:${h}px"></div>`
+      + `<div class="yc-y">${escapeHtml("’"+String(y).slice(2))}</div></a>`;
+  }).join("") + `</div>`;
+}
+
+function renderDashboard(){
+  setRoute("view"); setNav("dashboard"); HLQ="";
+  const byYear=new Map(), dojYear=new Map(), vio=new Map(), chan=new Map();
+  for(const r of RECORDS){
+    const y=r._year; if(y){ byYear.set(y,(byYear.get(y)||0)+1); }
+    if(r.source_sheet==="DOJ Settlements" && y && typeof r["Total Amount"]==="number")
+      dojYear.set(y,(dojYear.get(y)||0)+r["Total Amount"]);
+    const v=pick(r,VTYPE_KEYS); if(v) vio.set(v,(vio.get(v)||0)+1);
+    if(CHANNEL_SHEETS.has(r.source_sheet)) chan.set(r.source_sheet,(chan.get(r.source_sheet)||0)+1);
+  }
+  const years=[...byYear.keys()].map(Number).sort((a,b)=>a-b).map(String);
+  const dojYears=years.filter(y=>dojYear.has(y));
+  const topVio=[...vio.entries()].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const topCo=[...COMPANIES.values()].sort((a,b)=>b.records.length-a.records.length).slice(0,10);
+  const chanArr=[...chan.entries()].sort((a,b)=>b[1]-a[1]);
+
+  el("app").innerHTML = backBar()
+    + `<div class="dash-head"><h1>Analytics Dashboard</h1>`
+    + `<div class="rsub">${STATS.records} records · ${STATS.companies} companies · ${fmtMoneyFull(STATS.dojTotal)} in DOJ settlements (2004–2026)</div></div>`
+    + `<div class="dash-grid">`
+    + `<div class="panel wide"><h2>Enforcement actions by year<span class="sum">${STATS.records}</span></h2>`
+      + ychart(years, y=>byYear.get(y)||0, v=>String(v), (y,v)=>`${y}: ${v} record${v===1?"":"s"}`) + `</div>`
+    + `<div class="panel wide"><h2>DOJ settlement dollars by year<span class="sum">${fmtMoney(STATS.dojTotal)}</span></h2>`
+      + ychart(dojYears, y=>dojYear.get(y)||0, v=>fmtMoney(v), (y,v)=>`${y}: ${fmtMoneyFull(v)}`) + `</div>`
+    + `<div class="panel"><h2>Top violation types</h2>`
+      + hbars(topVio.map(([n,c])=>[n,c,`#/browse/violation/${encodeURIComponent(n)}`])) + `</div>`
+    + `<div class="panel"><h2>Most-cited companies</h2>`
+      + hbars(topCo.map(b=>[b.display, b.records.length, `#/company/${encodeURIComponent(b.key)}`])) + `</div>`
+    + `<div class="panel wide"><h2>Channel breakdown</h2>`
+      + hbars(chanArr.map(([n,c])=>[n,c,`#/browse/sheet/${encodeURIComponent(n)}`])) + `</div>`
+    + `</div>`;
+  wireBack(); wireCommon();
+}
+
+/* =========================================================================
+   Browse hub + facet listings
+   ========================================================================= */
+function renderBrowseHub(){
+  setRoute("view"); setNav("browse"); HLQ="";
+  const vio=new Map(), yr=new Map(), sh=new Map();
+  for(const r of RECORDS){
+    const v=pick(r,VTYPE_KEYS); if(v) vio.set(v,(vio.get(v)||0)+1);
+    if(r._year) yr.set(r._year,(yr.get(r._year)||0)+1);
+    sh.set(r.source_sheet,(sh.get(r.source_sheet)||0)+1);
+  }
+  const chips=(entries, dim)=> `<div class="bchips">` + entries.map(([label,count])=>
+    `<a class="bchip" data-href="#/browse/${dim}/${encodeURIComponent(label)}">${escapeHtml(String(label))}<span class="bn">${count}</span></a>`).join("") + `</div>`;
+
+  const vioE=[...vio.entries()].sort((a,b)=>b[1]-a[1]);
+  const yrE=[...yr.entries()].sort((a,b)=>String(b[0]).localeCompare(String(a[0])));
+  const shE=[...sh.entries()].sort((a,b)=>b[1]-a[1]);
+  const cos=[...COMPANIES.values()].sort((a,b)=>a.display.localeCompare(b.display));
+
+  el("app").innerHTML = backBar()
+    + `<div class="dash-head"><h1>Browse</h1><div class="rsub">Explore the dataset by category. No search needed.</div></div>`
+    + `<div class="browse-sec"><h2>Violation type / doctrine</h2>${chips(vioE,"violation")}</div>`
+    + `<div class="browse-sec"><h2>Year</h2>${chips(yrE,"year")}</div>`
+    + `<div class="browse-sec"><h2>Sheet / channel</h2>${chips(shE,"sheet")}</div>`
+    + `<div class="browse-sec"><h2>Companies (${cos.length})</h2><div class="company-index">`
+      + cos.map(b=>`<a data-company="${escapeHtml(b.key)}">${escapeHtml(b.display)}</a>`).join("")
+      + `</div></div>`;
+  wireBack(); wireCommon();
+}
+
+let browseState = {key:"", sort:"newest"};
+function renderBrowseList(dim, value){
+  setRoute("view"); setNav("browse"); HLQ="";
+  const label = ({violation:"Violation type", year:"Year", sheet:"Sheet", channel:"Channel"})[dim] || dim;
+  const recs = RECORDS.filter(r=>{
+    if(dim==="violation") return pick(r,VTYPE_KEYS)===value;
+    if(dim==="year") return r._year===value;
+    if(dim==="sheet" || dim==="channel") return r.source_sheet===value;
+    return false;
+  });
+  const k = dim+"/"+value;
+  if(browseState.key!==k) browseState = {key:k, sort:"newest"};
+
+  el("app").innerHTML = backBar()
+    + `<div class="results-head"><h1>${escapeHtml(label)}: ${escapeHtml(value)}</h1><div class="rsub" id="brsub"></div></div>`
+    + `<div id="browse-body"></div>`;
+  wireBack();
+  renderBrowseBody(recs, label, value);
+}
+function renderBrowseBody(recs, label, value){
+  const st=browseState;
+  let rows=recs.slice();
+  if(st.sort==="newest") rows.sort((a,b)=>dnum(b)-dnum(a));
+  else if(st.sort==="oldest") rows.sort((a,b)=>dnum(a)-dnum(b));
+  else if(st.sort==="company") rows.sort((a,b)=>String(a._title).localeCompare(String(b._title)));
+  exportSet = {name:"browse-"+label+"-"+value, records:rows};
+
+  const nSheets=new Set(rows.map(r=>r.source_sheet)).size;
+  el("brsub").innerHTML = `<b>${rows.length}</b> record${rows.length===1?"":"s"} across <b>${nSheets}</b> sheet${nSheets===1?"":"s"}`;
+
+  let body = `<div class="controls"><div></div><div class="ctrl-right">
+      <label class="ctrl">Sort
+        <select id="b-sort">
+          <option value="newest" ${st.sort==="newest"?"selected":""}>Newest first</option>
+          <option value="oldest" ${st.sort==="oldest"?"selected":""}>Oldest first</option>
+          <option value="company" ${st.sort==="company"?"selected":""}>Company A–Z</option>
+        </select></label>
+      <button class="btn-act" data-act="export">⤓ Export CSV</button>
+    </div></div>`;
+  body += `<div class="section"><h2>Records<span class="sum">${rows.length}</span></h2>`;
+  if(rows.length){ for(const r of rows) body += searchRecordRow(r); }
+  else body += `<div style="padding:22px 18px;color:var(--muted);font-size:13.5px">No records.</div>`;
+  body += `</div>`;
+  el("browse-body").innerHTML = body;
+
+  const so=el("b-sort"); if(so) so.addEventListener("change", ()=>{ browseState.sort=so.value; renderBrowseBody(recs,label,value); });
+  wireCommon(el("browse-body"));
+}
+
+/* =========================================================================
+   Direct-quotes spotlight
+   ========================================================================= */
+let quotesState = {vio:"", q:"", _t:null};
+function renderQuotes(){
+  setRoute("view"); setNav("quotes");
+  el("app").innerHTML = backBar()
+    + `<div class="results-head"><h1>Direct Quotes</h1>`
+    + `<div class="rsub">Verbatim promotional claims FDA cited: what companies said, and why it was flagged.</div></div>`
+    + `<div id="quotes-body"></div>`;
+  wireBack();
+  renderQuotesBody();
+}
+function renderQuotesBody(){
+  const all = RECORDS.filter(r=>r.source_sheet==="Direct Quotes");
+  const vios = [...new Set(all.map(r=>pick(r,VTYPE_KEYS)).filter(Boolean))].sort();
+  const st = quotesState;
+  HLQ = st.q.trim();
+  let list = all.filter(r=>{
+    if(st.vio && pick(r,VTYPE_KEYS)!==st.vio) return false;
+    if(st.q && !r._hay.includes(st.q.toLowerCase())) return false;
+    return true;
+  }).sort((a,b)=>dnum(b)-dnum(a));
+  exportSet = {name:"direct-quotes", records:list};
+
+  let controls = `<div class="controls">
+      <div class="q-filter"><input id="q-in" type="text" placeholder="Filter quotes…" value="${escapeHtml(st.q)}"></div>
+      <div class="ctrl-right">
+        <label class="ctrl">Violation
+          <select id="q-vio"><option value="">All violations (${all.length})</option>`
+          + vios.map(v=>`<option value="${escapeHtml(v)}" ${st.vio===v?"selected":""}>${escapeHtml(v)}</option>`).join("")
+          + `</select></label>
+        <button class="btn-act" data-act="export">⤓ Export CSV</button>
+      </div></div>`;
+  let body = controls + `<div class="rsub" style="margin-bottom:6px"><b>${list.length}</b> quote${list.length===1?"":"s"}</div>`;
+  if(list.length){ for(const r of list) body += quoteCard(r); }
+  else body += `<div class="empty-view">No quotes match this filter.</div>`;
+  el("quotes-body").innerHTML = body;
+
+  const qi=el("q-in");
+  if(qi) qi.addEventListener("input", ()=>{
+    clearTimeout(quotesState._t);
+    quotesState._t=setTimeout(()=>{
+      quotesState.q=qi.value; renderQuotesBody();
+      const nn=el("q-in"); if(nn){ nn.focus(); nn.setSelectionRange(nn.value.length, nn.value.length); }
+    }, 160);
+  });
+  const qv=el("q-vio"); if(qv) qv.addEventListener("change", ()=>{ quotesState.vio=qv.value; renderQuotesBody(); });
+  wireCommon(el("quotes-body"));
+}
+function quoteCard(r){
+  const said=r["WHAT THEY SAID"]||"";
+  const why=r["WHY FDA FLAGGED IT"]||"";
+  const vt=pick(r,VTYPE_KEYS);
+  const meta=[r.COMPANY, r.PRODUCT, fmtDate(r.DATE)||r._year, r.CHANNEL].filter(Boolean);
+  return `<div class="qcard" data-id="${r._id}">
+      <div class="qsaid">${hl(snippet(said, HLQ, 320))}</div>`
+    + (why?`<div class="qwhy"><b>Why flagged:</b> ${hl(snippet(why, HLQ, 260))}</div>`:"")
+    + `<div class="qmeta">`
+      + meta.map(m=>`<span class="qtag">${escapeHtml(String(m))}</span>`).join("")
+      + (vt?`<span class="qtag" style="background:#e6eefb">${escapeHtml(vt)}</span>`:"")
+    + `</div></div>`;
+}
+
+/* =========================================================================
+   Cross-linking: glossary annotation of record text
+   ========================================================================= */
+let GLOSS_RE=null, GLOSS_MAP=null;
+function ensureGlossIndex(){
+  if(GLOSS_MAP) return;
+  GLOSS_MAP=new Map(); const keys=[];
+  for(const g of GLOSSARY){
+    const term=g.Term||""; if(!term) continue;
+    const cands=[];
+    const base=term.replace(/\s*\([^)]*\)\s*/g," ").trim(); if(base) cands.push(base);
+    const abbr=(term.match(/\(([^)]+)\)/)||[])[1];
+    if(abbr && /^[A-Za-z][A-Za-z0-9][A-Za-z0-9.\/ -]*$/.test(abbr.trim())) cands.push(abbr.trim());
+    for(const c of cands){
+      if(c.length<3) continue;
+      const kl=c.toLowerCase();
+      if(!GLOSS_MAP.has(kl)){ GLOSS_MAP.set(kl, {term:g.Term, def:g.Definition||""}); keys.push(c); }
+    }
+  }
+  keys.sort((a,b)=>b.length-a.length);
+  const esc=keys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
+  GLOSS_RE = esc.length ? new RegExp("\\b("+esc.join("|")+")\\b","gi") : null;
+}
+// Escape + URL-linkify + wrap known glossary terms (first occurrence) with hover definitions.
+function annotate(raw){
+  const s=String(raw);
+  ensureGlossIndex();
+  if(!GLOSS_RE) return linkify(escapeHtml(s));
+  GLOSS_RE.lastIndex=0;
+  let out="", last=0, m; const used=new Set();
+  while((m=GLOSS_RE.exec(s))){
+    out += linkify(escapeHtml(s.slice(last, m.index)));
+    const kl=m[0].toLowerCase(), info=GLOSS_MAP.get(kl);
+    if(info && !used.has(kl)){
+      used.add(kl);
+      out += `<span class="gloss" title="${escapeHtml(info.term + ": " + info.def)}">${escapeHtml(m[0])}</span>`;
+    } else out += escapeHtml(m[0]);
+    last = m.index + m[0].length;
+  }
+  out += linkify(escapeHtml(s.slice(last)));
+  return out;
+}
+
 /* ---- record slide-over ---- */
 function openRecord(id){
   const rec = RECORDS[id];
@@ -1003,22 +1498,39 @@ function openRecord(id){
   for(const [k,v] of Object.entries(rec)){
     if(k==="source_sheet"||k.startsWith("_")) continue;
     const val = String(v);
-    const rendered = linkify(hl(val));
-    if(/^https?:\/\//.test(val) && !cta){
-      cta = `<div class="panel-cta"><a href="${escapeHtml(val)}" target="_blank" rel="noopener">Open source ↗</a></div>`;
+    if(/^https?:\/\//.test(val.trim()) && val.trim().split(/\s+/).length===1 && !cta){
+      cta = `<div class="panel-cta"><a href="${escapeHtml(val.trim())}" target="_blank" rel="noopener">Open source ↗</a></div>`;
     }
-    fields += `<div class="field"><div class="k">${escapeHtml(k)}</div><div class="v">${rendered}</div></div>`;
+    fields += `<div class="field"><div class="k">${escapeHtml(k)}</div><div class="v">${annotate(val)}</div></div>`;
   }
+
+  // Related cross-links: company/parties → profiles, violation & year → browse.
+  const rel=[]; const seenCo=new Set();
+  const addCo = raw => {
+    if(!raw) return;
+    const key=normCompany(raw);
+    if(key && COMPANIES.has(key) && !seenCo.has(key)){
+      seenCo.add(key);
+      rel.push(`<a class="rel-co" data-href="#/company/${encodeURIComponent(key)}">🏢 ${escapeHtml(COMPANIES.get(key).display)}</a>`);
+    }
+  };
+  addCo(pick(rec,COMPANY_KEYS)); addCo(rec.Plaintiff); addCo(rec.Defendant);
+  addCo(rec.Challenger); addCo(rec.Advertiser);
+  const vt=pick(rec,VTYPE_KEYS);
+  if(vt) rel.push(`<a class="rel-v" data-href="#/browse/violation/${encodeURIComponent(vt)}">${escapeHtml(vt)}</a>`);
+  if(rec._year) rel.push(`<a class="rel-v" data-href="#/browse/year/${encodeURIComponent(rec._year)}">${escapeHtml(rec._year)}</a>`);
+  const relBar = rel.length ? `<div class="rel">${rel.join("")}</div>` : "";
 
   panel.innerHTML =
     `<div class="panel-top">
        <div><div class="pt-badge">${escapeHtml(rec.source_sheet)}</div><h2>${hl(rec._title)}</h2></div>
        <button class="panel-close" id="panel-close" aria-label="Close">✕</button>
      </div>
-     <div class="panel-body">${fields}${cta}</div>`;
+     <div class="panel-body">${relBar}${fields}${cta}</div>`;
   panel.classList.add("open"); panel.setAttribute("aria-hidden","false");
   backdrop.classList.add("open");
   el("panel-close").addEventListener("click", closeRecordNav);
+  wireCommon(panel);
 }
 function closeRecord(){
   el("panel").classList.remove("open"); el("panel").setAttribute("aria-hidden","true");
@@ -1050,8 +1562,13 @@ function ensureBase(hash){
   lastRenderedBase = hash;
   const mComp = hash.match(/^#\/company\/(.+)$/);
   const mSearch = hash.match(/^#\/search\/(.+)$/);
+  const mBrowse = hash.match(/^#\/browse\/([^/]+)\/(.+)$/);
   if(mComp){ renderCompany(decodeURIComponent(mComp[1])); }
   else if(mSearch){ renderSearchPage(decodeURIComponent(mSearch[1])); }
+  else if(hash==="#/dashboard"){ renderDashboard(); }
+  else if(hash==="#/browse"){ renderBrowseHub(); }
+  else if(mBrowse){ renderBrowseList(decodeURIComponent(mBrowse[1]), decodeURIComponent(mBrowse[2])); }
+  else if(hash==="#/quotes"){ renderQuotes(); }
   else { renderLanding(); }
 }
 
@@ -1100,7 +1617,7 @@ fetch("data.json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return
   router();
 })
 .catch(err=>{
-  el("app").innerHTML = `<div class="empty-view">Could not load <code>data.json</code> — ${escapeHtml(err.message)}.<br>Serve this folder over HTTP (e.g. <code>python3 -m http.server</code>), not via file://.</div>`;
+  el("app").innerHTML = `<div class="empty-view">Could not load <code>data.json</code>: ${escapeHtml(err.message)}.<br>Serve this folder over HTTP (e.g. <code>python3 -m http.server</code>), not via file://.</div>`;
 });
 </script>
 </body>
