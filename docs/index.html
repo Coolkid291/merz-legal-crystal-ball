@@ -188,6 +188,31 @@
   .row .rchev{color:var(--faint);align-self:center;flex:none}
   .empty-view{text-align:center;color:var(--muted);padding:50px 0}
 
+  /* search-all row in dropdown */
+  .dd-seeall .dd-ico{background:var(--navy);color:#fff;font-size:15px}
+  .dd-seeall .dd-title{font-weight:650}
+  .dd-seeall .dd-chev{font-size:13px;color:var(--faint)}
+
+  /* full search results page */
+  .results-head{margin-bottom:16px}
+  .results-head h1{margin:0;font-size:23px;font-weight:730;letter-spacing:-.3px;color:var(--navy-ink)}
+  .results-head .rsub{font-size:13px;color:var(--muted);margin-top:5px}
+  .results-head .rsub b{color:var(--navy)}
+  .controls{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .seg-btn{display:inline-flex;align-items:center;gap:6px;border:none;background:none;cursor:pointer;
+    font-size:13px;font-weight:600;color:var(--muted);padding:6px 12px;border-radius:7px;transition:all .12s}
+  .seg-btn:hover{color:var(--navy)}
+  .seg-btn.on{background:var(--navy);color:#fff}
+  .seg-n{font-size:11px;font-weight:700;background:var(--chip);color:var(--navy);border-radius:20px;padding:0 6px;min-width:18px;text-align:center}
+  .seg-btn.on .seg-n{background:rgba(255,255,255,.22);color:#fff}
+  .ctrl-right{display:flex;gap:10px;flex-wrap:wrap}
+  .ctrl{display:inline-flex;align-items:center;gap:7px;font-size:11px;text-transform:uppercase;
+    letter-spacing:.5px;color:var(--faint);font-weight:700}
+  .ctrl select{font-family:inherit;font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;
+    color:var(--ink);border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;
+    box-shadow:var(--shadow);cursor:pointer;max-width:220px}
+
   /* ---------- Record slide-over ---------- */
   #backdrop{position:fixed;inset:0;background:rgba(16,26,48,.42);backdrop-filter:blur(2px);z-index:60;
     opacity:0;pointer-events:none;transition:opacity .2s}
@@ -431,12 +456,15 @@ function snippet(text, q, radius){
 /* =========================================================================
    Fuzzy matching
    ========================================================================= */
-// returns a score (higher better) or null
-function matchScore(text, q){
+// returns a score (higher better) or null.
+// fuzzy=true adds subsequence (typo-tolerant) matching — only sensible for short
+// strings like titles/company/glossary terms, not the full record haystack.
+function matchScore(text, q, fuzzy){
   text = text.toLowerCase();
   const i = text.indexOf(q);
   if(i===0) return 1000;
   if(i>0){ const wb = /\W|_/.test(text[i-1]); return (wb?820:640) - Math.min(i,200); }
+  if(fuzzy===false) return null;
   // subsequence fuzzy
   let ti=0, qi=0, gaps=0, last=-2, started=false;
   for(; ti<text.length && qi<q.length; ti++){
@@ -463,7 +491,7 @@ function searchAll(raw){
   const recs = [];
   for(const r of RECORDS){
     const st = matchScore(r._title, q);
-    const sh = matchScore(r._hay, q);
+    const sh = matchScore(r._hay, q, false);   // body: substring only, no fuzzy noise
     let sc = null;
     if(st!=null) sc = st + 120;
     else if(sh!=null) sc = sh;
@@ -475,18 +503,21 @@ function searchAll(raw){
   const gl = [];
   for(const g of GLOSSARY){
     const stt = matchScore(g.Term||"", q);
-    const sd = matchScore(g.Definition||"", q);
+    const sd = matchScore(g.Definition||"", q, false);
     let sc = null;
     if(stt!=null) sc = stt + 120; else if(sd!=null) sc = sd;
     if(sc!=null) gl.push([sc, g]);
   }
   gl.sort((a,b)=> b[0]-a[0]);
 
+  const fullC = comp.map(x=>x[1]), fullR = recs.map(x=>x[1]), fullG = gl.map(x=>x[1]);
   return {
-    companies: comp.slice(0,6).map(x=>x[1]),
-    records: recs.slice(0,8).map(x=>x[1]),
-    glossary: gl.slice(0,5).map(x=>x[1]),
-    total: comp.length + recs.length + gl.length
+    companies: fullC.slice(0,6),
+    records: fullR.slice(0,8),
+    glossary: fullG.slice(0,5),
+    counts: {companies:fullC.length, records:fullR.length, glossary:fullG.length},
+    total: comp.length + recs.length + gl.length,
+    full: {companies:fullC, records:fullR, glossary:fullG}
   };
 }
 
@@ -510,8 +541,16 @@ function renderDropdown(){
 
   if(!res.total){
     html += `<div class="dd-empty">No matches for “${escapeHtml(q)}”.</div>`;
-    dd.innerHTML = html; dd.classList.add("open"); return;
+    dd.innerHTML = html; dd.classList.add("open"); navItems=[]; activeIndex=-1; return;
   }
+
+  // "See all" row — default highlighted; Enter opens the full results page.
+  html += `<div class="dd-sec"><div class="dd-item dd-seeall" data-nav="${idx}" data-kind="search">`
+        + `<div class="dd-ico" aria-hidden="true">⌕</div>`
+        + `<div class="dd-main"><div class="dd-title">See all results for “${escapeHtml(q.trim())}”</div>`
+        + `<div class="dd-meta">${res.total} match${res.total===1?"":"es"} · sort &amp; filter on a full page</div></div>`
+        + `<div class="dd-chev">↵</div></div></div>`;
+  navItems.push({kind:"search", q:q.trim()}); idx++;
 
   if(res.companies.length){
     html += `<div class="dd-sec"><div class="dd-label">Companies</div>`;
@@ -602,8 +641,14 @@ function paintActive(){
 function activate(i){
   const it = navItems[i]; if(!it) return;
   closeDropdown();
-  if(it.kind==="company") location.hash = "#/company/" + encodeURIComponent(it.key);
+  if(it.kind==="search") location.hash = "#/search/" + encodeURIComponent(it.q);
+  else if(it.kind==="company") location.hash = "#/company/" + encodeURIComponent(it.key);
   else location.hash = "#/record/" + it.id;
+}
+function gotoSearch(q){
+  q = (q||"").trim(); if(!q) return;
+  closeDropdown();
+  location.hash = "#/search/" + encodeURIComponent(q);
 }
 function closeDropdown(){ const dd=el("dropdown"); dd.classList.remove("open"); dd.innerHTML=""; navItems=[]; activeIndex=-1; }
 
@@ -621,7 +666,159 @@ function renderLanding(){
       <div class="tile"><div class="v">${fmtMoney(STATS.dojTotal)}</div><div class="l">DOJ settlements</div></div>
       <div class="tile"><div class="v">${STATS.glossary}</div><div class="l">Glossary terms</div></div>
     </div>
-    <div class="hint">Start typing above · <span class="kbd">↑</span><span class="kbd">↓</span> to navigate · <span class="kbd">↵</span> to open · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus search</div>`;
+    <div class="hint">Start typing above · <span class="kbd">↵</span> for all results · <span class="kbd">↑</span><span class="kbd">↓</span> then <span class="kbd">↵</span> to jump to one · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus</div>`;
+}
+
+/* ---- Full search results page ---- */
+let searchState = {q:"", type:"all", sheet:"", sort:"relevance"};
+let searchRes = null;
+
+function renderSearchPage(q){
+  setRoute("view");
+  q = (q||"").trim();
+  // reflect the query in the search box + highlighting
+  el("q").value = q;
+  HLQ = q;
+  // fresh state whenever the query changes
+  if(searchState.q !== q){ searchState = {q, type:"all", sheet:"", sort:"relevance"}; }
+  searchRes = searchAll(q);
+
+  el("app").innerHTML = backBar()
+    + `<div class="results-head">
+         <h1>Results for “${escapeHtml(q)}”</h1>
+         <div class="rsub" id="rsub"></div>
+       </div>
+       <div id="search-body"></div>`;
+  wireBack();
+  renderSearchResults();
+}
+
+function sheetsOf(recs){ return new Set(recs.map(r=>r.source_sheet)); }
+
+function renderSearchResults(){
+  if(!searchRes) return;
+  const f = searchRes.full, c = searchRes.counts;
+  const st = searchState;
+
+  // ---- records: filter by sheet, then sort ----
+  let recs = f.records.slice();
+  if(st.sheet) recs = recs.filter(r=>r.source_sheet===st.sheet);
+  if(st.sort==="newest") recs.sort((a,b)=> dnum(b)-dnum(a));
+  else if(st.sort==="oldest") recs.sort((a,b)=> dnum(a)-dnum(b));
+  else if(st.sort==="company") recs.sort((a,b)=> String(a._title).localeCompare(String(b._title)));
+  // "relevance" keeps original scored order
+
+  const showC = (st.type==="all"||st.type==="companies");
+  const showR = (st.type==="all"||st.type==="records");
+  const showG = (st.type==="all"||st.type==="glossary");
+
+  // ---- subheading ----
+  const shownRecords = showR ? recs.length : 0;
+  const sub = [];
+  if(showR) sub.push(`<b>${recs.length}</b> record${recs.length===1?"":"s"} across <b>${sheetsOf(recs).size}</b> sheet${sheetsOf(recs).size===1?"":"s"}`);
+  if(showC && f.companies.length) sub.push(`<b>${f.companies.length}</b> compan${f.companies.length===1?"y":"ies"}`);
+  if(showG && f.glossary.length) sub.push(`<b>${f.glossary.length}</b> glossary term${f.glossary.length===1?"":"s"}`);
+  el("rsub").innerHTML = sub.join(" · ") || "No matches.";
+
+  // ---- controls ----
+  const seg = (val,label,n)=>`<button class="seg-btn ${st.type===val?"on":""}" data-type="${val}">${label}<span class="seg-n">${n}</span></button>`;
+  let controls = `<div class="controls">
+     <div class="seg">
+       ${seg("all","All", searchRes.total)}
+       ${seg("companies","Companies", c.companies)}
+       ${seg("records","Records", c.records)}
+       ${seg("glossary","Glossary", c.glossary)}
+     </div>
+     <div class="ctrl-right">`;
+  if(showR && c.records){
+    const sheets=[...sheetsOf(f.records)].sort();
+    controls += `<label class="ctrl">Sheet
+       <select id="f-sheet"><option value="">All sheets (${c.records})</option>`
+       + sheets.map(s=>`<option value="${escapeHtml(s)}" ${st.sheet===s?"selected":""}>${escapeHtml(s)} (${f.records.filter(r=>r.source_sheet===s).length})</option>`).join("")
+       + `</select></label>`;
+    controls += `<label class="ctrl">Sort
+       <select id="f-sort">
+         <option value="relevance" ${st.sort==="relevance"?"selected":""}>Relevance</option>
+         <option value="newest" ${st.sort==="newest"?"selected":""}>Newest first</option>
+         <option value="oldest" ${st.sort==="oldest"?"selected":""}>Oldest first</option>
+         <option value="company" ${st.sort==="company"?"selected":""}>Company A–Z</option>
+       </select></label>`;
+  }
+  controls += `</div></div>`;
+
+  // ---- lists ----
+  let body = controls;
+
+  if(showC && f.companies.length){
+    body += sectionOpen("Companies", `${f.companies.length}`);
+    for(const b of f.companies) body += companyRowHtml(b);
+    body += `</div>`;
+  }
+
+  if(showR){
+    body += sectionOpen("Records", `${recs.length}`);
+    if(recs.length){ for(const r of recs) body += searchRecordRow(r); }
+    else body += `<div style="padding:22px 18px;color:var(--muted);font-size:13.5px">No records match this filter.</div>`;
+    body += `</div>`;
+  }
+
+  if(showG && f.glossary.length){
+    body += `<div class="section"><h2>Glossary<span class="sum">${f.glossary.length}</span></h2><div style="padding:8px 8px 12px">`;
+    for(const g of f.glossary){
+      body += `<div class="gcard"><div><span class="gterm">${hl(g.Term||"")}</span>`
+            + (g.Category?`<span class="gcat">${escapeHtml(g.Category)}</span>`:"") + `</div>`
+            + `<div class="gdef">${hl(g.Definition||"")}</div>`
+            + (g["Where It Appears"]?`<div class="gwhere">Appears in: ${escapeHtml(g["Where It Appears"])}</div>`:"")
+            + `</div>`;
+    }
+    body += `</div></div>`;
+  }
+
+  if(!f.companies.length && !recs.length && !f.glossary.length){
+    body += `<div class="empty-view">No matches for “${escapeHtml(st.q)}”. Try a broader term.</div>`;
+  }
+
+  el("search-body").innerHTML = body;
+
+  // ---- wire ----
+  el("search-body").querySelectorAll(".seg-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{ searchState.type=btn.dataset.type; renderSearchResults(); });
+  });
+  const fs=el("f-sheet"); if(fs) fs.addEventListener("change", ()=>{ searchState.sheet=fs.value; renderSearchResults(); });
+  const so=el("f-sort"); if(so) so.addEventListener("change", ()=>{ searchState.sort=so.value; renderSearchResults(); });
+  el("search-body").querySelectorAll(".row[data-id]").forEach(r=>{
+    r.addEventListener("click", ()=> location.hash = "#/record/" + r.dataset.id);
+  });
+  el("search-body").querySelectorAll(".row[data-company]").forEach(r=>{
+    r.addEventListener("click", ()=> location.hash = "#/company/" + encodeURIComponent(r.dataset.company));
+  });
+}
+
+function companyRowHtml(b){
+  const s=b.summary, bits=[];
+  if(s.doj) bits.push(`${s.doj} DOJ`);
+  if(s.letters) bits.push(`${s.letters} FDA letter${s.letters>1?"s":""}`);
+  if(s.quotes) bits.push(`${s.quotes} quote${s.quotes>1?"s":""}`);
+  if(s.lawsuits) bits.push(`${s.lawsuits} lawsuit${s.lawsuits>1?"s":""}`);
+  if(s.nad) bits.push(`${s.nad} NAD`);
+  if(s.channels) bits.push(`${s.channels} channel`);
+  if(!bits.length) bits.push(`${s.total} record${s.total>1?"s":""}`);
+  const initials = b.display.replace(/[^A-Za-z ]/g,"").split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase() || "•";
+  return `<div class="row" data-company="${escapeHtml(b.key)}">
+      <div class="rl"><div class="dd-ico company" style="margin:0">${escapeHtml(initials)}</div></div>
+      <div class="rm"><div class="rtitle">${hl(b.display)}</div>
+        <div class="rsnip">${escapeHtml(bits.join(" · "))}${s.dojTotal?` · <b style="color:var(--navy)">${fmtMoney(s.dojTotal)}</b>`:""}</div></div>
+      <div class="rchev">›</div></div>`;
+}
+
+function searchRecordRow(rec){
+  const meta = [rec.Channel||rec.CHANNEL||rec["Legal Basis"]].filter(Boolean).join(" · ");
+  return `<div class="row" data-id="${rec._id}">
+      <div class="rl"><div class="rdate">${escapeHtml(fmtDate(recDate(rec))||rec._year||"—")}</div>
+        <div class="rtag">${escapeHtml(sheetShort(rec.source_sheet))}</div></div>
+      <div class="rm"><div class="rtitle">${hl(rec._title)}${meta?` <span style="color:var(--faint);font-weight:400">— ${escapeHtml(meta)}</span>`:""}</div>
+        <div class="rsnip">${firstMatchField(rec, HLQ)}</div></div>
+      <div class="rchev">›</div></div>`;
 }
 
 function rowHtml(rec, leftTop, leftTag, badge, title, snip){
@@ -852,7 +1049,9 @@ function ensureBase(hash){
   if(lastRenderedBase===hash) return;
   lastRenderedBase = hash;
   const mComp = hash.match(/^#\/company\/(.+)$/);
+  const mSearch = hash.match(/^#\/search\/(.+)$/);
   if(mComp){ renderCompany(decodeURIComponent(mComp[1])); }
+  else if(mSearch){ renderSearchPage(decodeURIComponent(mSearch[1])); }
   else { renderLanding(); }
 }
 
@@ -867,7 +1066,11 @@ function wireSearch(){
     const dd=el("dropdown");
     if(e.key==="ArrowDown"){ e.preventDefault(); if(navItems.length){ activeIndex=Math.min(navItems.length-1,activeIndex+1); paintActive(); } }
     else if(e.key==="ArrowUp"){ e.preventDefault(); if(navItems.length){ activeIndex=Math.max(0,activeIndex-1); paintActive(); } }
-    else if(e.key==="Enter"){ if(activeIndex>=0){ e.preventDefault(); activate(activeIndex); } }
+    else if(e.key==="Enter"){
+      e.preventDefault();
+      if(activeIndex>=0) activate(activeIndex);
+      else if(q.value.trim()) gotoSearch(q.value);
+    }
     else if(e.key==="Escape"){ if(dd.classList.contains("open")){ closeDropdown(); } else { q.blur(); } }
   });
   // click outside closes dropdown
