@@ -24,6 +24,10 @@
     --shadow:0 1px 3px rgba(21,39,71,.06), 0 6px 24px rgba(21,39,71,.05);
     --shadow-lg:0 12px 40px rgba(21,39,71,.16);
     --radius:12px;
+    --ease-out:cubic-bezier(.2,.7,.2,1);
+    --dur-fast:.18s;
+    --dur:.5s;
+    --dur-slow:.7s;
     --fs:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
@@ -62,7 +66,12 @@
   @media(max-width:560px){.brand .sub{display:none}}
 
   /* hero (landing) vs slim */
-  .hero{text-align:center;padding:46px 22px 26px;transition:all .25s ease}
+  .hero{text-align:center;padding:46px 22px 26px;transition:all .25s ease;position:relative;overflow:hidden}
+  .hero > *:not(.mesh){position:relative;z-index:1}
+  .hero .eyebrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--gold);margin-right:8px;vertical-align:middle}
+  .hero .hero-underline{display:block;width:66px;height:3px;margin:0 auto 4px;border-radius:2px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-line))}
   .hero .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
     color:#a8bce2;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
     padding:5px 14px;border-radius:999px;margin-bottom:18px}
@@ -359,6 +368,47 @@
     .grid2,.dash-grid{gap:12px}
     a{color:#111;text-decoration:none}
   }
+
+  /* ---------- Motion system (MOTION.md) ---------- */
+  @media (prefers-reduced-motion: no-preference){
+    /* staggered reveal: elements start hidden, .in class reveals them */
+    .anim{opacity:0; transform:translateY(14px);}
+    .anim.in{opacity:1; transform:translateY(0);
+      transition:opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);}
+    .anim.d1{transition-delay:.06s}
+    .anim.d2{transition-delay:.12s}
+    .anim.d3{transition-delay:.18s}
+    .anim.d4{transition-delay:.24s}
+
+    /* gold underline draw */
+    .draw{transform:scaleX(0); transform-origin:left;
+      transition:transform .6s var(--ease-out);}
+    .draw.in{transform:scaleX(1);}
+
+    /* pulsing live dot */
+    .live-dot{animation:pulse 2s ease-out infinite;}
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(184,149,47,.55)}
+      70%{box-shadow:0 0 0 8px rgba(184,149,47,0)}
+      100%{box-shadow:0 0 0 0 rgba(184,149,47,0)}
+    }
+
+    /* slow drifting hero glow */
+    .mesh{
+      position:absolute; inset:-20%; pointer-events:none;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(184,149,47,.22), transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.07), transparent 35%),
+        radial-gradient(circle at 60% 80%, rgba(184,149,47,.13), transparent 40%);
+      filter:blur(30px); animation:drift 14s ease-in-out infinite alternate;
+    }
+    @keyframes drift{0%{transform:translate(0,0) scale(1)} 100%{transform:translate(3%,-4%) scale(1.08)}}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .anim{opacity:1; transform:none;}
+    .draw{transform:none;}
+  }
 </style>
 </head>
 <body class="route-landing">
@@ -372,12 +422,14 @@
       </div>
     </div>
     <div class="hero">
-      <span class="eyebrow">Pharma Advertising Compliance Intelligence</span>
-      <h1>Merz Legal Crystal Ball</h1>
-      <p>Every DOJ settlement, FDA warning letter, competitor lawsuit, and flagged promotional claim, searchable in one place.</p>
+      <div class="mesh"></div>
+      <span class="eyebrow anim d1"><span class="dot live-dot"></span>Pharma Advertising Compliance Intelligence</span>
+      <h1 class="anim d2">Merz Legal Crystal Ball</h1>
+      <span class="hero-underline draw d3"></span>
+      <p class="anim d3">Every DOJ settlement, FDA warning letter, competitor lawsuit, and flagged promotional claim, searchable in one place.</p>
     </div>
     <div class="search-shell">
-      <div class="search-box">
+      <div class="search-box anim d4">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="q" type="text" autocomplete="off" spellcheck="false"
                placeholder="Search companies, records, or glossary terms…" aria-label="Search">
@@ -553,6 +605,20 @@ function fmtMoney(n){
   return "$" + n;
 }
 function fmtMoneyFull(n){ return "$" + Number(n).toLocaleString("en-US"); }
+
+// Count-up for numbers. fmt(v) optional (e.g. fmtMoney to keep a compact "$11.09B").
+function countUp(el, end, prefix, fmt){
+  const show = v => el.textContent = fmt ? fmt(v) : (prefix||"") + Math.round(v).toLocaleString();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ show(end); return; }
+  const t0 = performance.now(), dur = 1100;
+  (function tick(t){
+    const p = Math.min((t - t0)/dur, 1), eased = 1 - Math.pow(1 - p, 3);
+    show(end*eased);
+    if(p < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+// Reveal on load: add .in to every .anim/.draw inside a container.
+function revealIn(root){ if(root) root.querySelectorAll('.anim, .draw').forEach(el => el.classList.add('in')); }
 
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -784,6 +850,7 @@ function closeDropdown(){ const dd=el("dropdown"); dd.classList.remove("open"); 
    Views
    ========================================================================= */
 function setRoute(cls){ document.body.classList.toggle("route-landing", cls==="landing"); }
+let landingAnimated = false;
 
 function latestRecords(n){
   return RECORDS.filter(r=>(catOf(r.source_sheet)==="doj"||catOf(r.source_sheet)==="letter") && dnum(r)>0)
@@ -804,12 +871,14 @@ function renderLanding(){
         <div class="rchev">›</div></div>`;
   }).join("");
 
+  const anim = !landingAnimated;
+  const ac = anim ? "tile anim" : "tile";
   el("app").innerHTML =
     `<div class="tiles">
-      <div class="tile"><div class="v">${STATS.records}</div><div class="l">Records tracked</div></div>
-      <div class="tile"><div class="v">${STATS.companies}</div><div class="l">Companies</div></div>
-      <div class="tile"><div class="v">${fmtMoney(STATS.dojTotal)}</div><div class="l">DOJ settlements</div></div>
-      <div class="tile"><div class="v">${STATS.glossary}</div><div class="l">Glossary terms</div></div>
+      <div class="${ac} d1"><div class="v" data-count="${STATS.records}">${anim?"0":STATS.records}</div><div class="l">Records tracked</div></div>
+      <div class="${ac} d2"><div class="v" data-count="${STATS.companies}">${anim?"0":STATS.companies}</div><div class="l">Companies</div></div>
+      <div class="${ac} d3"><div class="v" data-count="${STATS.dojTotal}" data-money="1">${anim?"$0":fmtMoney(STATS.dojTotal)}</div><div class="l">DOJ settlements</div></div>
+      <div class="${ac} d4"><div class="v" data-count="${STATS.glossary}">${anim?"0":STATS.glossary}</div><div class="l">Glossary terms</div></div>
     </div>
     <div class="hint">Type above to search · <span class="kbd">↵</span> for all results · <span class="kbd">/</span> or <span class="kbd">⌘K</span> to focus from anywhere</div>
 
@@ -843,6 +912,13 @@ function renderLanding(){
       </div>
     </div>`;
   wireCommon();
+  if(anim){
+    landingAnimated = true;
+    const tiles = el("app").querySelector(".tiles");
+    el("app").querySelectorAll(".tile .v[data-count]").forEach(v =>
+      countUp(v, +v.dataset.count, "", v.dataset.money ? fmtMoney : null));
+    requestAnimationFrame(()=> revealIn(tiles));
+  }
 }
 function topViolationChips(n){
   const vio=new Map();
@@ -1615,6 +1691,7 @@ fetch("data.json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return
   wireSearch();
   window.addEventListener("hashchange", router);
   router();
+  requestAnimationFrame(()=> revealIn(document.querySelector('.hwrap.search-row')));
 })
 .catch(err=>{
   el("app").innerHTML = `<div class="empty-view">Could not load <code>data.json</code>: ${escapeHtml(err.message)}.<br>Serve this folder over HTTP (e.g. <code>python3 -m http.server</code>), not via file://.</div>`;
