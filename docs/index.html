@@ -392,26 +392,63 @@
   #backdrop{position:fixed;inset:0;background:rgba(16,26,48,.42);backdrop-filter:blur(2px);z-index:60;
     opacity:0;pointer-events:none;transition:opacity .2s}
   #backdrop.open{opacity:1;pointer-events:auto}
-  #panel{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--bg);z-index:61;
-    box-shadow:-16px 0 50px rgba(16,26,48,.28);transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);
+  #panel{position:fixed;top:0;right:0;height:100%;width:min(640px,96vw);background:var(--card);z-index:61;
+    box-shadow:-16px 0 60px rgba(8,16,38,.34);transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
     display:flex;flex-direction:column}
   #panel.open{transform:translateX(0)}
-  .panel-top{background:var(--navy);color:#fff;padding:18px 20px;display:flex;align-items:flex-start;gap:12px}
-  .panel-top .pt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
-    background:rgba(255,255,255,.16);padding:3px 9px;border-radius:6px;display:inline-block;margin-bottom:7px}
-  .panel-top h2{margin:0;font-size:18px;font-weight:700;line-height:1.3}
-  .panel-close{margin-left:auto;background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;
-    border-radius:8px;font-size:18px;cursor:pointer;flex:none;line-height:1;transition:background .12s}
-  .panel-close:hover{background:rgba(255,255,255,.24)}
-  .panel-body{padding:16px 20px 40px;overflow-y:auto}
-  .field{padding:11px 0;border-bottom:1px solid var(--line-2)}
-  .field:last-child{border-bottom:none}
-  .field .k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:700;margin-bottom:4px}
-  .field .v{font-size:13.5px;color:var(--ink);white-space:pre-wrap;word-break:break-word}
-  .field .v a{color:var(--navy);word-break:break-all}
-  .panel-cta{margin-top:16px}
-  .panel-cta a{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--navy);
-    text-decoration:none;border:1px solid var(--line);background:#fff;padding:8px 13px;border-radius:9px;box-shadow:var(--shadow)}
+  /* reading hero */
+  .read-hero{position:relative;background:linear-gradient(160deg,var(--navy) 0%, var(--navy-ink) 100%);
+    color:#fff;padding:24px 26px 20px;flex:none;overflow:hidden}
+  .read-hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 90% at 88% -20%, rgba(184,149,47,.22), transparent 55%)}
+  .read-hero > *{position:relative;z-index:1}
+  .read-hero .pt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    background:rgba(255,255,255,.16);padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:11px}
+  .read-hero h2{margin:0;font-size:22px;font-weight:740;line-height:1.26;letter-spacing:-.4px;max-width:90%}
+  .panel-close{position:absolute;top:16px;right:16px;z-index:2;background:rgba(255,255,255,.12);border:none;color:#fff;
+    width:32px;height:32px;border-radius:8px;font-size:17px;cursor:pointer;line-height:1;transition:background .12s}
+  .panel-close:hover{background:rgba(255,255,255,.26)}
+  .read-meta{display:flex;flex-wrap:wrap;gap:15px 24px;margin-top:17px}
+  .rm-item{min-width:0}
+  .rm-l{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:#a9b8d6;font-weight:700}
+  .rm-v{font-size:13px;color:#eef3fc;font-weight:600;margin-top:3px}
+  /* reading body */
+  .read{flex:1;overflow-y:auto;padding:26px 28px 64px}
+  .read-sec{margin:0 0 26px;max-width:64ch}
+  .read-sec h4{margin:0 0 11px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--faint);
+    font-weight:800;display:flex;align-items:center;gap:10px}
+  .read-sec h4::after{content:"";flex:1;height:1px;background:var(--line-2)}
+  .prose{font-size:15px;line-height:1.74;color:var(--ink)}
+  .prose p{margin:0 0 11px}
+  .prose p:last-child{margin-bottom:0}
+  .prose a{color:var(--navy);word-break:break-word}
+  .prose-list{list-style:none;margin:0;padding:0}
+  .prose-list li{position:relative;padding-left:22px;margin:0 0 10px;font-size:15px;line-height:1.66;color:var(--ink)}
+  .prose-list li:last-child{margin-bottom:0}
+  .prose-list li::before{content:"";position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:50%;
+    background:var(--gold);box-shadow:0 0 0 3px rgba(184,149,47,.14)}
+  .read-quote{margin:2px 0 22px;padding:4px 0 4px 22px;border-left:3px solid var(--gold);max-width:60ch;
+    font-size:21px;line-height:1.5;font-weight:600;color:var(--navy-ink);letter-spacing:-.2px}
+  .read-quote::before{content:"“";color:var(--gold);font-size:30px;font-weight:800;margin-right:2px;line-height:0;vertical-align:-6px}
+  .read-why{margin:0 0 26px;font-size:14px;line-height:1.66;color:var(--muted);max-width:62ch}
+  .read-why .rw-l{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:800;
+    color:var(--faint);margin-bottom:6px}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:15px 24px}
+  @media(max-width:520px){.facts{grid-template-columns:1fr}}
+  .fact .f-k{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);font-weight:700;margin-bottom:3px}
+  .fact .f-v{font-size:13.5px;color:var(--ink);line-height:1.5;word-break:break-word}
+  .fact .f-v a{color:var(--navy);word-break:break-word}
+  .read-cta{margin:4px 0 22px}
+  .read-cta a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#fff;
+    text-decoration:none;background:var(--navy);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);transition:background .12s}
+  .read-cta a:hover{background:var(--navy-2)}
+  @media (prefers-reduced-motion: no-preference){
+    .read > .anim:nth-child(1){transition-delay:.03s}
+    .read > .anim:nth-child(2){transition-delay:.08s}
+    .read > .anim:nth-child(3){transition-delay:.13s}
+    .read > .anim:nth-child(4){transition-delay:.18s}
+    .read > .anim:nth-child(n+5){transition-delay:.22s}
+  }
 
   mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
   .loading{text-align:center;color:var(--muted);padding:60px 0}
@@ -1776,49 +1813,95 @@ function annotate(raw){
 }
 
 /* ---- record slide-over ---- */
+const MONEY_KEYS = new Set(["Total Amount","Federal Civil","Criminal Fine","State Share","Relator Award"]);
+const PROSE_KEYS = new Set(["Summary","SUMMARY","Notes","NOTES","Allegation Summary","Issue Summary",
+  "Compliance Lesson","Rule Established","Definition"]);
+function isProse(s){ return s.includes("\n") || s.length>90; }
+function prettyLabel(k){ return /[a-z]/.test(k) ? k : k.toLowerCase().replace(/\b\w/g, c=>c.toUpperCase()); }
+// Render prose: dash-bulleted blocks become real lists, otherwise paragraphs.
+function proseHtml(text){
+  const lines = String(text).split(/\n/).map(l=>l.trim()).filter(Boolean);
+  const bullety = lines.filter(l=>/^[-•·*]\s?/.test(l)).length;
+  if(bullety>=2 && bullety>=lines.length*0.6){
+    return `<ul class="prose-list">` + lines.map(l=>`<li>${annotate(l.replace(/^[-•·*]\s?/,""))}</li>`).join("") + `</ul>`;
+  }
+  return lines.map(l=>`<p>${annotate(l)}</p>`).join("");
+}
+
 function openRecord(id){
   const rec = RECORDS[id];
   const panel = el("panel"), backdrop = el("backdrop");
   if(!rec){ closeRecord(); return; }
+  const sheet = rec.source_sheet;
+  const vt = pick(rec, VTYPE_KEYS);
 
-  let fields="";
+  // Fields consumed by the header/title/links are excluded from the body.
+  const used = new Set(["source_sheet","#","Company","COMPANY","Plaintiff","Defendant","Challenger","Advertiser",
+    "Year","YEAR","Era","WHAT THEY SAID","WHY FDA FLAGGED IT"]);
+
+  // Header fact strip
+  const meta=[];
+  const metaPush=(label,val,keys)=>{ if(val==null||val==="") return; meta.push([label,String(val)]); (keys||[]).forEach(k=>used.add(k)); };
+  const dv=recDate(rec);
+  metaPush("Date", dv?fmtDate(dv):rec._year, ["Settlement Date","DATE","Date"]);
+  metaPush("Product", rec.PRODUCT||rec.Product, ["PRODUCT","Product"]);
+  metaPush("Channel", rec.CHANNEL||rec.Channel, ["CHANNEL","Channel"]);
+  metaPush("Audience", rec.AUDIENCE||rec.Audience, ["AUDIENCE","Audience"]);
+  metaPush("Violation", vt, ["Violation Type","VIOLATION TYPE","Doctrine","Violation Category","VIOLATION CATEGORY"]);
+  metaPush("Court", rec["Citation / Court"], ["Citation / Court"]);
+  metaPush("District", rec.District, ["District"]);
+  metaPush("Legal basis", rec["Legal Basis"], ["Legal Basis"]);
+  metaPush("Type", rec["Civil / Criminal"], ["Civil / Criminal"]);
+
+  // Split remaining fields into prose sections, a details grid, and a source CTA.
   let cta="";
+  const said=rec["WHAT THEY SAID"], why=rec["WHY FDA FLAGGED IT"];
+  const proseSecs=[], facts=[];
   for(const [k,v] of Object.entries(rec)){
-    if(k==="source_sheet"||k.startsWith("_")) continue;
-    const val = String(v);
-    if(/^https?:\/\//.test(val.trim()) && val.trim().split(/\s+/).length===1 && !cta){
-      cta = `<div class="panel-cta"><a href="${escapeHtml(val.trim())}" target="_blank" rel="noopener">Open source ↗</a></div>`;
-    }
-    fields += `<div class="field"><div class="k">${escapeHtml(k)}</div><div class="v">${annotate(val)}</div></div>`;
+    if(k.startsWith("_") || used.has(k)) continue;
+    const sval=String(v).trim();
+    if(sval==="") continue;
+    if(/^https?:\/\//.test(sval) && sval.split(/\s+/).length===1){ if(!cta) cta=sval; continue; }
+    if(PROSE_KEYS.has(k) || isProse(sval)) proseSecs.push([k,sval]);
+    else facts.push([k, (MONEY_KEYS.has(k) && typeof v==="number") ? fmtMoneyFull(v) : sval]);
   }
 
-  // Related cross-links: company/parties → profiles, violation & year → browse.
+  // Related cross-links
   const rel=[]; const seenCo=new Set();
-  const addCo = raw => {
-    if(!raw) return;
-    const key=normCompany(raw);
-    if(key && COMPANIES.has(key) && !seenCo.has(key)){
-      seenCo.add(key);
-      rel.push(`<a class="rel-co" data-href="#/company/${encodeURIComponent(key)}">🏢 ${escapeHtml(COMPANIES.get(key).display)}</a>`);
-    }
-  };
-  addCo(pick(rec,COMPANY_KEYS)); addCo(rec.Plaintiff); addCo(rec.Defendant);
-  addCo(rec.Challenger); addCo(rec.Advertiser);
-  const vt=pick(rec,VTYPE_KEYS);
+  const addCo = raw => { if(!raw) return; const key=normCompany(raw);
+    if(key && COMPANIES.has(key) && !seenCo.has(key)){ seenCo.add(key);
+      rel.push(`<a class="rel-co" data-href="#/company/${encodeURIComponent(key)}">🏢 ${escapeHtml(COMPANIES.get(key).display)}</a>`); } };
+  addCo(pick(rec,COMPANY_KEYS)); addCo(rec.Plaintiff); addCo(rec.Defendant); addCo(rec.Challenger); addCo(rec.Advertiser);
   if(vt) rel.push(`<a class="rel-v" data-href="#/browse/violation/${encodeURIComponent(vt)}">${escapeHtml(vt)}</a>`);
   if(rec._year) rel.push(`<a class="rel-v" data-href="#/browse/year/${encodeURIComponent(rec._year)}">${escapeHtml(rec._year)}</a>`);
-  const relBar = rel.length ? `<div class="rel">${rel.join("")}</div>` : "";
+
+  // Assemble
+  const metaHtml = meta.length ? `<div class="read-meta">` + meta.map(([l,v])=>
+    `<div class="rm-item"><div class="rm-l">${escapeHtml(l)}</div><div class="rm-v">${hl(v)}</div></div>`).join("") + `</div>` : "";
+  let body="";
+  if(said) body += `<blockquote class="read-quote anim">${annotate(said)}</blockquote>`;
+  if(said && why) body += `<div class="read-why anim"><span class="rw-l">Why FDA flagged it</span>${annotate(why)}</div>`;
+  for(const [k,v] of proseSecs)
+    body += `<section class="read-sec anim"><h4>${escapeHtml(prettyLabel(k))}</h4><div class="prose">${proseHtml(v)}</div></section>`;
+  if(facts.length)
+    body += `<section class="read-sec anim"><h4>Details</h4><div class="facts">` + facts.map(([k,v])=>
+      `<div class="fact"><div class="f-k">${escapeHtml(prettyLabel(k))}</div><div class="f-v">${annotate(v)}</div></div>`).join("") + `</div></section>`;
+  if(cta) body += `<div class="read-cta anim"><a href="${escapeHtml(cta)}" target="_blank" rel="noopener">Open source ↗</a></div>`;
+  if(rel.length) body += `<section class="read-sec anim"><h4>Explore related</h4><div class="rel">${rel.join("")}</div></section>`;
 
   panel.innerHTML =
-    `<div class="panel-top">
-       <div><div class="pt-badge">${escapeHtml(rec.source_sheet)}</div><h2>${hl(rec._title)}</h2></div>
+    `<div class="read-hero">
        <button class="panel-close" id="panel-close" aria-label="Close">✕</button>
+       <div class="pt-badge">${escapeHtml(sheet)}</div>
+       <h2>${hl(rec._title)}</h2>
+       ${metaHtml}
      </div>
-     <div class="panel-body">${relBar}${fields}${cta}</div>`;
+     <div class="read">${body}</div>`;
   panel.classList.add("open"); panel.setAttribute("aria-hidden","false");
   backdrop.classList.add("open");
   el("panel-close").addEventListener("click", closeRecordNav);
   wireCommon(panel);
+  requestAnimationFrame(()=> revealIn(panel));
 }
 function closeRecord(){
   el("panel").classList.remove("open"); el("panel").setAttribute("aria-hidden","true");
