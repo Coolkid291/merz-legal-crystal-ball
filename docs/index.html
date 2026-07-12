@@ -352,6 +352,16 @@
   .hb .hb-track{grid-column:1/-1;height:8px;background:var(--line-2);border-radius:5px;overflow:hidden}
   .hb .hb-fill{height:100%;background:linear-gradient(90deg,#4661a0,#1F3864);border-radius:5px}
   a.hb:hover .hb-l{color:var(--navy)}
+  /* enforcement heatmap */
+  .heat{display:grid;grid-template-columns:auto repeat(12,1fr);gap:3px;align-items:center}
+  .heat .hm-h{font-size:9px;color:var(--faint);text-align:center;font-weight:700}
+  .heat .hm-y{font-size:11px;color:var(--muted);font-weight:600;padding-right:8px;text-align:right;
+    white-space:nowrap;text-decoration:none;cursor:pointer}
+  .heat a.hm-y:hover{color:var(--navy)}
+  .heat .hm-c{aspect-ratio:1;border-radius:3px;min-height:11px;transition:transform .1s var(--ease-out)}
+  .heat .hm-c:hover{transform:scale(1.28)}
+  .heat-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:11px;color:var(--faint)}
+  .heat-legend .sw{width:13px;height:13px;border-radius:3px;display:inline-block}
 
   /* ---------- Browse ---------- */
   .browse-sec{margin-bottom:24px}
@@ -503,6 +513,11 @@
   @media (prefers-reduced-motion: reduce){
     .anim{opacity:1; transform:none;}
     .draw{transform:none;}
+  }
+  @media (prefers-reduced-motion: no-preference){
+    ::view-transition-old(root),::view-transition-new(root){
+      animation-duration:.34s; animation-timing-function:var(--ease-out);
+    }
   }
 </style>
 </head>
@@ -748,6 +763,12 @@ function revealRows(root, sel){
     el.style.transitionDelay = (i<8 ? i*45 : 0) + 'ms';
   });
   observeReveal(root);
+}
+// Smooth cross-view morph via the View Transitions API (progressive enhancement).
+function withTransition(fn){
+  if(document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    document.startViewTransition(fn);
+  else fn();
 }
 
 /* Crystal-ball data orb: a 3D field where every particle is one record,
@@ -1622,6 +1643,42 @@ function ychart(years, valOf, labelOf, titleOf){
   }).join("") + `</div>`;
 }
 
+const _MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function heatColor(p){
+  if(p<=0) return "var(--line-2)";
+  const a=[74,110,180], b=[184,149,47];   // navy -> gold, no new tokens
+  const c=a.map((v,i)=>Math.round(v+(b[i]-v)*p));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+// Year x month enforcement-intensity grid, built from records with real dates.
+function heatmapHtml(){
+  const grid=new Map(); let maxC=0;
+  for(const r of RECORDS){
+    const d=recDate(r); if(!d) continue;
+    const t=Date.parse(d); if(isNaN(t)) continue;
+    const dt=new Date(t), y=dt.getFullYear(), mo=dt.getMonth();
+    if(y<2000||y>2035) continue;
+    if(!grid.has(y)) grid.set(y, new Array(12).fill(0));
+    grid.get(y)[mo]++;
+  }
+  const years=[...grid.keys()].sort((a,b)=>a-b);
+  if(!years.length) return `<div style="color:var(--muted);font-size:13px">No dated records.</div>`;
+  for(const y of years) for(const c of grid.get(y)) if(c>maxC) maxC=c;
+  const MON=["J","F","M","A","M","J","J","A","S","O","N","D"];
+  let h=`<div class="heat"><div></div>` + MON.map(m=>`<div class="hm-h">${m}</div>`).join("");
+  for(const y of years){
+    h += `<a class="hm-y" data-href="#/browse/year/${y}">${y}</a>`;
+    for(let m=0;m<12;m++){ const c=grid.get(y)[m];
+      const p = c>0 ? 0.18+0.82*(c/maxC) : 0;
+      h += `<div class="hm-c" style="background:${heatColor(p)}" title="${_MONTHS[m]} ${y}: ${c} record${c===1?"":"s"}"></div>`;
+    }
+  }
+  h += `</div><div class="heat-legend">Fewer`
+     + [0.2,0.45,0.7,1].map(p=>`<span class="sw" style="background:${heatColor(p)}"></span>`).join("")
+     + `More</div>`;
+  return h;
+}
+
 function renderDashboard(){
   setRoute("view"); setNav("dashboard"); HLQ="";
   const byYear=new Map(), dojYear=new Map(), vio=new Map(), chan=new Map();
@@ -1652,6 +1709,8 @@ function renderDashboard(){
       + hbars(topCo.map(b=>[b.display, b.records.length, `#/company/${encodeURIComponent(b.key)}`])) + `</div>`
     + `<div class="panel wide"><h2>Channel breakdown</h2>`
       + hbars(chanArr.map(([n,c])=>[n,c,`#/browse/sheet/${encodeURIComponent(n)}`])) + `</div>`
+    + `<div class="panel wide"><h2>Enforcement heatmap<span class="sum">by month</span></h2>`
+      + heatmapHtml() + `</div>`
     + `</div>`;
   wireBack(); wireCommon();
   const grow = ()=> el("app").querySelectorAll(".yc-bar").forEach(b=>{ b.style.height = b.dataset.h + "px"; });
@@ -1958,7 +2017,7 @@ function router(){
   }
   closeRecord();
   currentBaseHash = hash;
-  ensureBase(hash);
+  withTransition(()=> ensureBase(hash));
   orbSync();
   window.scrollTo(0,0);
 }
