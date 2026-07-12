@@ -341,7 +341,8 @@
   .yc{flex:1 0 auto;min-width:22px;display:flex;flex-direction:column;align-items:center;gap:4px;
     text-decoration:none;justify-content:flex-end}
   .yc-bar{width:70%;max-width:24px;background:linear-gradient(180deg,#4661a0,#1F3864);border-radius:4px 4px 2px 2px;
-    min-height:3px;transition:height .3s ease}
+    min-height:3px;transition:height .55s var(--ease-out)}
+  @media (prefers-reduced-motion: reduce){.yc-bar{transition:none}}
   .yc:hover .yc-bar{filter:brightness(1.15)}
   .yc-v{font-size:9.5px;color:var(--muted);font-weight:700}
   .yc-y{font-size:10px;color:var(--faint)}
@@ -715,6 +716,39 @@ function countUp(el, end, prefix, fmt){
 }
 // Reveal on load: add .in to every .anim/.draw inside a container.
 function revealIn(root){ if(root) root.querySelectorAll('.anim, .draw').forEach(el => el.classList.add('in')); }
+
+// Scroll reveal: one shared observer, reveals .anim rows as they enter view.
+const _io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){
+    e.target.classList.add('in');
+    if(e.target.dataset.grow) growEl(e.target);
+    _io.unobserve(e.target);
+  }});
+}, {threshold:.12, rootMargin:'0px 0px -40px 0px'});
+function observeReveal(root){
+  if(!root) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    root.querySelectorAll('.anim,.draw').forEach(el=>{ el.classList.add('in'); if(el.dataset.grow) growEl(el); });
+    return;
+  }
+  root.querySelectorAll('.anim,.draw').forEach(el=>_io.observe(el));
+}
+// Grow-in for revealed [data-grow] elements (currently the exposure gauge).
+function growEl(el){
+  const gv = el.querySelector('.g-val');
+  if(gv) gv.style.strokeDashoffset = gv.dataset.off;   // CSS transition animates; disabled under reduced-motion via @media
+  const gn = el.querySelector('.g-num[data-count]');
+  if(gn) countUp(gn, +gn.dataset.count, '');            // countUp handles reduced-motion itself
+}
+// Tag list rows as .anim with a capped stagger (first 8), then observe them.
+function revealRows(root, sel){
+  if(!root) return;
+  root.querySelectorAll(sel).forEach((el,i)=>{
+    el.classList.add('anim');
+    el.style.transitionDelay = (i<8 ? i*45 : 0) + 'ms';
+  });
+  observeReveal(root);
+}
 
 /* Crystal-ball data orb: a 3D field where every particle is one record,
    colored by type, rotating inside a glass sphere. Inhales toward the search
@@ -1284,6 +1318,7 @@ function renderSearchResults(){
   el("search-body").querySelectorAll(".row[data-company]").forEach(r=>{
     r.addEventListener("click", ()=> location.hash = "#/company/" + encodeURIComponent(r.dataset.company));
   });
+  revealRows(el("search-body"), ".row, .gcard");
 }
 
 function companyRowHtml(b){
@@ -1365,7 +1400,7 @@ function renderCompany(key){
         `<a class="bchip" data-company="${escapeHtml(o.key)}">${escapeHtml(o.display)}<span class="bn">${n}</span></a>`).join("") + `</div>`
     : `<div style="color:var(--muted);font-size:13px">No companies share this violation profile.</div>`;
   html += `<div class="grid2">`
-       + `<div class="panel"><h2>Exposure index</h2>${gaugeHtml(risk)}</div>`
+       + `<div class="panel anim" data-grow="gauge"><h2>Exposure index</h2>${gaugeHtml(risk)}</div>`
        + `<div class="panel"><h2>Related companies<span class="sum">shared violations</span></h2>${relHtml}</div>`
        + `</div>`;
 
@@ -1446,12 +1481,7 @@ function renderCompany(key){
   el("app").innerHTML = html;
   wireBack();
   wireCommon();
-  requestAnimationFrame(()=>{
-    const gv = el("app").querySelector(".g-val");
-    if(gv) gv.style.strokeDashoffset = gv.dataset.off;
-    const gn = el("app").querySelector(".g-num[data-count]");
-    if(gn) countUp(gn, +gn.dataset.count, "");
-  });
+  revealRows(el("app"), ".row");   // rows + (via observeReveal) the data-grow gauge panel
 }
 
 function sectionOpen(title, sum){
@@ -1587,7 +1617,7 @@ function ychart(years, valOf, labelOf, titleOf){
     const v=vals[i]; const h=Math.round(6 + (v/max)*126);
     return `<a class="yc" data-href="#/browse/year/${encodeURIComponent(y)}" title="${escapeHtml(titleOf(y,v))}">`
       + `<div class="yc-v">${escapeHtml(labelOf(v))}</div>`
-      + `<div class="yc-bar" style="height:${h}px"></div>`
+      + `<div class="yc-bar" data-h="${h}" style="height:0;transition-delay:${(i<12?i*40:0)}ms"></div>`
       + `<div class="yc-y">${escapeHtml("’"+String(y).slice(2))}</div></a>`;
   }).join("") + `</div>`;
 }
@@ -1624,6 +1654,8 @@ function renderDashboard(){
       + hbars(chanArr.map(([n,c])=>[n,c,`#/browse/sheet/${encodeURIComponent(n)}`])) + `</div>`
     + `</div>`;
   wireBack(); wireCommon();
+  const grow = ()=> el("app").querySelectorAll(".yc-bar").forEach(b=>{ b.style.height = b.dataset.h + "px"; });
+  matchMedia('(prefers-reduced-motion: reduce)').matches ? grow() : requestAnimationFrame(grow);
 }
 
 /* =========================================================================
@@ -1703,6 +1735,7 @@ function renderBrowseBody(recs, label, value){
 
   const so=el("b-sort"); if(so) so.addEventListener("change", ()=>{ browseState.sort=so.value; renderBrowseBody(recs,label,value); });
   wireCommon(el("browse-body"));
+  revealRows(el("browse-body"), ".row");
 }
 
 /* =========================================================================
@@ -1754,6 +1787,7 @@ function renderQuotesBody(){
   });
   const qv=el("q-vio"); if(qv) qv.addEventListener("change", ()=>{ quotesState.vio=qv.value; renderQuotesBody(); });
   wireCommon(el("quotes-body"));
+  revealRows(el("quotes-body"), ".qcard");
 }
 function quoteCard(r){
   const said=r["WHAT THEY SAID"]||"";
