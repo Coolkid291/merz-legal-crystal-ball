@@ -66,17 +66,36 @@
   @media(max-width:560px){.brand .sub{display:none}}
 
   /* hero (landing) vs slim */
-  .hero{text-align:center;padding:46px 22px 26px;transition:all .25s ease;position:relative;overflow:hidden}
-  .hero > *:not(.mesh){position:relative;z-index:1}
+  .hero{text-align:center;padding:40px 22px 26px;transition:all .25s ease;position:relative;overflow:hidden;
+    min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .hero > *:not(.mesh):not(.orb-stage){position:relative;z-index:1}
   .hero .eyebrow .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
     background:var(--gold);margin-right:8px;vertical-align:middle}
   .hero .hero-underline{display:block;width:66px;height:3px;margin:0 auto 4px;border-radius:2px;
     background:linear-gradient(90deg,var(--gold),var(--gold-line))}
+
+  /* crystal-ball data orb */
+  .orb-stage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;
+    width:min(500px,88vw);height:min(500px,88vw);pointer-events:none}
+  #orb-canvas{position:absolute;inset:0;width:100%;height:100%}
+  .orb-glass{position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(120% 120% at 32% 24%, rgba(255,255,255,.14), rgba(255,255,255,.03) 24%, transparent 48%);
+    box-shadow:inset 0 2px 34px rgba(255,255,255,.07), inset 0 -34px 72px rgba(8,16,38,.5), 0 46px 96px rgba(8,16,38,.55);
+    border:1px solid rgba(255,255,255,.08)}
+  .orb-glass::before{content:"";position:absolute;inset:-1px;border-radius:50%;
+    background:conic-gradient(from 210deg, transparent 0deg, rgba(184,149,47,.6) 60deg, transparent 145deg, rgba(120,150,210,.5) 240deg, transparent 320deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+    animation:orbspin 22s linear infinite}
+  @keyframes orbspin{to{transform:rotate(360deg)}}
+  @media(max-width:560px){.hero{min-height:300px}.orb-stage{width:min(340px,86vw);height:min(340px,86vw)}}
+  @media (prefers-reduced-motion: reduce){.orb-glass::before{animation:none}}
   .hero .eyebrow{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
     color:#a8bce2;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
     padding:5px 14px;border-radius:999px;margin-bottom:18px}
-  .hero h1{margin:0 0 12px;font-size:42px;font-weight:770;letter-spacing:-1.2px;line-height:1.03;
-    background:linear-gradient(180deg,#ffffff 0%,#c9d7f2 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero h1{margin:0 0 12px;font-size:44px;font-weight:770;letter-spacing:-1.2px;line-height:1.03;
+    background:linear-gradient(180deg,#ffffff 0%,#c9d7f2 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 3px 18px rgba(6,12,30,.55))}
   .hero p{margin:0 auto 24px;font-size:15.5px;color:#b7c5e3;max-width:600px;line-height:1.55}
   @media(max-width:560px){.hero h1{font-size:30px}.hero{padding:34px 18px 22px}}
   body:not(.route-landing) .hero{display:none}
@@ -423,6 +442,7 @@
     </div>
     <div class="hero">
       <div class="mesh"></div>
+      <div class="orb-stage"><canvas id="orb-canvas"></canvas><div class="orb-glass"></div></div>
       <span class="eyebrow anim d1"><span class="dot live-dot"></span>Pharma Advertising Compliance Intelligence</span>
       <h1 class="anim d2">Merz Legal Crystal Ball</h1>
       <span class="hero-underline draw d3"></span>
@@ -619,6 +639,78 @@ function countUp(el, end, prefix, fmt){
 }
 // Reveal on load: add .in to every .anim/.draw inside a container.
 function revealIn(root){ if(root) root.querySelectorAll('.anim, .draw').forEach(el => el.classList.add('in')); }
+
+/* Crystal-ball data orb: a 3D field where every particle is one record,
+   colored by type, rotating inside a glass sphere. Inhales toward the search
+   box on focus, tilts with the cursor. Meaningful, not decorative. */
+let orb = null;
+function initOrb(){
+  const stage = document.querySelector('.orb-stage');
+  const canvas = document.getElementById('orb-canvas');
+  const hero = document.querySelector('.hero');
+  if(!stage || !canvas || !hero) return;
+  const ctx = canvas.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COL = { doj:[221,181,80], letter:[110,146,220], quote:[228,196,126],
+    lawsuit:[132,174,222], nad:[152,168,198], channel:[186,206,240], other:[150,162,186] };
+  const parts = RECORDS.map(r=>{
+    const u=Math.random(), v=Math.random();
+    const theta=Math.acos(2*u-1), phi=2*Math.PI*v, rad=Math.cbrt(0.18+0.82*Math.random());
+    return { x:Math.sin(theta)*Math.cos(phi)*rad, y:Math.cos(theta)*rad, z:Math.sin(theta)*Math.sin(phi)*rad,
+             c:COL[catOf(r.source_sheet)]||COL.other };
+  });
+  let W=0,H=0,R=0,cx=0,cy=0, dpr=Math.min(window.devicePixelRatio||1,2);
+  function resize(){
+    W=stage.clientWidth; H=stage.clientHeight; if(!W||!H) return;
+    canvas.width=W*dpr; canvas.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    cx=W/2; cy=H/2; R=Math.min(W,H)/2*0.92;
+  }
+  let yaw=0, tiltX=0, tiltY=0, tgtX=0, tgtY=0, pull=0, tgtPull=0, running=false, raf=0;
+  hero.addEventListener('pointermove', e=>{ const b=hero.getBoundingClientRect();
+    tgtY=((e.clientX-b.left)/b.width-0.5)*0.6; tgtX=((e.clientY-b.top)/b.height-0.5)*-0.5; });
+  hero.addEventListener('pointerleave', ()=>{ tgtX=0; tgtY=0; });
+  const q=document.getElementById('q');
+  if(q){ q.addEventListener('focus', ()=>tgtPull=1); q.addEventListener('blur', ()=>tgtPull=0); }
+  function frame(){
+    if(!W) resize();
+    yaw += 0.0016 + pull*0.004;
+    tiltX += (tgtX-tiltX)*0.06; tiltY += (tgtY-tiltY)*0.06; pull += (tgtPull-pull)*0.05;
+    const rs=R*(1-0.26*pull), aY=yaw+tiltY;
+    const cY=Math.cos(aY), sY=Math.sin(aY), cX=Math.cos(tiltX), sX=Math.sin(tiltX);
+    ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='lighter';
+    const P=[];
+    for(const p of parts){
+      const x1=p.x*cY - p.z*sY, z1=p.x*sY + p.z*cY;
+      const y1=p.y*cX - z1*sX, z2=p.y*sX + z1*cX;
+      P.push({sx:cx+x1*rs, sy:cy+y1*rs, d:(z2+1)/2, c:p.c});
+    }
+    for(let i=0;i<P.length;i++){ const a=P[i];
+      for(let j=i+1;j<P.length;j++){ const b=P[j];
+        const dx=a.sx-b.sx, dy=a.sy-b.sy, d2=dx*dx+dy*dy;
+        if(d2<1600){ const al=(1-Math.sqrt(d2)/40)*0.09*Math.min(a.d,b.d);
+          if(al>0.012){ ctx.strokeStyle=`rgba(150,175,220,${al})`; ctx.lineWidth=.6;
+            ctx.beginPath(); ctx.moveTo(a.sx,a.sy); ctx.lineTo(b.sx,b.sy); ctx.stroke(); } } } }
+    for(const pt of P){
+      const dxc=(pt.sx-cx)/R, dyc=(pt.sy-cy)/R, dc=Math.hypot(dxc*0.8, dyc*1.5);
+      const clear = dc<0.6 ? 0.12+0.88*(dc/0.6) : 1;
+      const a=(0.15+0.7*pt.d)*clear*(0.72+0.5*pull), size=(0.6+1.7*pt.d)*(1+0.3*pull);
+      const c=pt.c;
+      ctx.beginPath(); ctx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${a*0.25})`; ctx.arc(pt.sx,pt.sy,size*3,0,7); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle=`rgba(${c[0]},${c[1]},${c[2]},${a})`; ctx.arc(pt.sx,pt.sy,size,0,7); ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+    if(running) raf=requestAnimationFrame(frame);
+  }
+  orb = {
+    start(){ resize(); if(reduce){ running=false; frame(); return; } if(running) return; running=true; frame(); },
+    stop(){ running=false; cancelAnimationFrame(raf); }
+  };
+  window.addEventListener('resize', ()=>{ resize(); if(!running) frame(); });
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.hidden) orb.stop(); else if(document.body.classList.contains('route-landing')) orb.start();
+  });
+}
+function orbSync(){ if(orb){ document.body.classList.contains('route-landing') ? orb.start() : orb.stop(); } }
 
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1630,6 +1722,7 @@ function router(){
   closeRecord();
   currentBaseHash = hash;
   ensureBase(hash);
+  orbSync();
   window.scrollTo(0,0);
 }
 let lastRenderedBase = null;
@@ -1691,6 +1784,7 @@ fetch("data.json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return
   wireSearch();
   window.addEventListener("hashchange", router);
   router();
+  initOrb(); orbSync();
   requestAnimationFrame(()=> revealIn(document.querySelector('.hwrap.search-row')));
 })
 .catch(err=>{
